@@ -15,9 +15,11 @@
     "clean": "gatsby clean"
   },
   "dependencies": {
+    "algosdk": "^1.8.1",
     "gatsby": "^2.26.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
-    "react-select": "^4.0.2"
+    "react-select": "^4.0.2",
+    "react-table": "^7.6.3"
   }
 }
