@@ -1,20 +1,11 @@
 import React, {useState, useContext, useEffect} from 'react';
 import Select from "react-select";
-
+import { AlgoSignerContext } from '../../contexts/algosigner.context';
 
 const networkOptions = [
     { value: 'TestNet', label: 'TestNet' },
     { value: 'MainNet', label: 'MainNet' },
 ]
-
-// const addressesOptions = [
-//     {value: "Y7DTZHSVUSPZNZ4N5ODX3NPO3SSGE37WCWIHGA7OFDMUCEU3DIVHYHNF2U", label: "Y7DTZHSVUSPZNZ4N5ODX3NPO3SSGE37WCWIHGA7OFDMUCEU3DIVHYHNF2U"},
-//     {value: "QGYW62CV77NIABFIC7Q6QJDG4OL3NWPZKQBHF7J6BOFJWI5VY6PCWOLS5Q", label: "QGYW62CV77NIABFIC7Q6QJDG4OL3NWPZKQBHF7J6BOFJWI5VY6PCWOLS5Q"}
-// ]
-// const addressesToConvert = [
-//     {"address":"Y7DTZHSVUSPZNZ4N5ODX3NPO3SSGE37WCWIHGA7OFDMUCEU3DIVHYHNF2U"},
-//     {"address":"QGYW62CV77NIABFIC7Q6QJDG4OL3NWPZKQBHF7J6BOFJWI5VY6PCWOLS5Q"}
-// ]
 
 const Ledger = (handleChange) => (
     <Select 
@@ -37,7 +28,7 @@ const Addresses = ({wallet, handleChange}) => {
     )
 }
 
-const AlgoSigner = () => {
+const AlgoSigner = (props) => {
 
     const [wallet, setWallet] = useState([]);
     const [ledger, setLedger] = useState('TestNet')
@@ -84,31 +75,35 @@ const AlgoSigner = () => {
     }, [ledger]);
 
     return (
+        <AlgoSignerContext.Provider value={{currentAddress,
+            ledger,
+            wallet}}>
+            
+            {/* TODO This doesn't work and don't know why  */}
+            {/* <Ledger ledger={ledger} onChange={handleChange}/> */}
+            {/* <Addresses wallet={wallet} onChange={handleChange}/> */}
 
-        <>
-        {/* TODO This doesn't work and don't know why  */}
-        {/* <Ledger ledger={ledger} onChange={handleChange}/> */}
-        {/* <Addresses wallet={wallet} onChange={handleChange}/> */}
+            <Select
+                inputId={"network"}
+                placeholder='Network'
+                options={networkOptions}
+                default={ledger}
+                onChange={handleLedgerChange}
+            />
+            <Select 
+                inputId={"address"}
+                placeholder='Address'
+                options={addressOptions} 
+                defaultValue={addressOptions[0]} 
+                onChange={handleAddressChange}
+            />
 
-        <Select
-            inputId={"network"}
-            placeholder='Network'
-            options={networkOptions}
-            default={ledger}
-            onChange={handleLedgerChange}
-        />
-        <Select 
-            inputId={"address"}
-            placeholder='Address'
-            options={addressOptions} 
-            defaultValue={addressOptions[0]} 
-            onChange={handleAddressChange}
-        />
+            <p>Current selected network: <b>{ledger}</b></p>
+            <p>Current selected address: <b>{currentAddress}</b></p>
 
-        <p>Current selected network: <b>{ledger}</b></p>
-        <p>Current selected address: <b>{currentAddress}</b></p>
-
-        </>
+            
+            {props.children}
+        </AlgoSignerContext.Provider>
     );
       
 }

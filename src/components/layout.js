@@ -18,15 +18,17 @@ export default function Layout({ children }) {
         </Link>
         <ul style={{ listStyle: `none`, float: `right` }}>
           <ListLink to="/">Home</ListLink>
-          <ListLink to="/about/">ASA Manager</ListLink>
-          <ListLink to="/contact/">ASA Config</ListLink>
-          <ListLink to="/contact/">Reports</ListLink>
+          <ListLink to="/asamanager/">ASA Manager</ListLink>
+          <ListLink to="/asaconfig/">ASA Config</ListLink>
+          <ListLink to="/reports/">Reports</ListLink>
           <br/>
-          <AlgoSigner/>
+          
         </ul>
       
       </header>
-      {children}
+      <AlgoSigner>
+        {children}
+      </AlgoSigner>
     </div>
   )
 }

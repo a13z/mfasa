@@ -1,5 +1,12 @@
 import { createContext } from 'react';
 
-const AlgoSignerContext = createContext(undefined);
+const AlgoSignerContext = createContext({
+    currentAddress: null,
+    network: null,
+    wallet: [],
+  });
 
-export default AlgoSignerContext;
+const AlgoSignerConsumer = AlgoSignerContext.Consumer;
+
+export { AlgoSignerConsumer };
+export { AlgoSignerContext };
