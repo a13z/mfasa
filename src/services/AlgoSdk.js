@@ -70,7 +70,7 @@ class AlgoSdk {
     }
 
     async getAccountInformation(address) {
-        return await this.getClient().accountInformation(address);
+        return await this.getClient().accountInformation(address).do();
     }
 
     async getAssetInformation(assetID) {
