@@ -30,12 +30,28 @@ const ASAList = (address) => {
     const columns = React.useMemo(
     () => [
         {
-        Header: 'Column 1',
-        accessor: 'col1', // accessor is the "key" in the data
+        Header: 'Name',
+        accessor: 'name', // accessor is the "key" in the data
         },
         {
-        Header: 'Column 2',
-        accessor: 'col2',
+        Header: 'Total Balance',
+        accessor: 'totalBalance',
+        },
+        {
+        Header: 'Whitelisted addresses',
+        accessor: 'whitelistedAddresses',
+        },
+        {
+        Header: 'Addresses With Balance',
+        accessor: 'addressedWithBalance',
+        },
+        {
+        Header: 'Assets Frozen',
+        accessor: 'assetsFrozen',
+        },
+        {
+        Header: 'Assets Revoked',
+        accessor: 'assetsRevoked',
         },
     ],
     []
@@ -55,13 +71,18 @@ const ASAList = (address) => {
         // .then(res => {
         //     const newPosts = res.data.data.children
         //     .map(obj => obj.data);
-    
         //     setPosts(newPosts);
         // });
 
         AlgoSdk.getAccountInformation(algoSignerContext.currentAddress).then((accountDetails) => {
             console.log(accountDetails);
-            // accountDetails['created-assets'].map(item => ({ label: item.address, value: item.address }));
+            setAccountDetails(accountDetails);
+            const columns = Object.keys(accountDetails);
+            console.log(columns);
+            accountDetails['created-assets'].map(item => {
+                console.log(item.index);
+                console.log(item.params.name, item.params.total)
+            });
 
         });
 
@@ -103,7 +124,6 @@ const ASAList = (address) => {
                 }}
                 >
                 {column.render('Header')}
-                <p>{algoSignerContext.network}</p>
                 </th>
             ))}
             </tr>
@@ -125,6 +145,8 @@ const ASAList = (address) => {
                     }}
                     >
                     {cell.render('Cell')}
+                    {accountDetails.amount}
+                    
                     </td>
                 )
                 })}
