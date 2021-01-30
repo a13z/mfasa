@@ -1,19 +1,21 @@
-import * as React from "react"
+import React from 'react';
 import { Link } from "gatsby"
 
 import Layout from '../components/layout'
 import ASAList from '../components/ASAList/ASAList.component'
+import ASATransactions from '../components/ASATransactions/ASATransactions.component'
+
 
 // styles
 const pageStyles = {
   color: "#232129",
-  padding: "96px",
+  padding: "10px",
   fontFamily: "-apple-system, Roboto, sans-serif, serif",
 }
 const headingStyles = {
   marginTop: 0,
   marginBottom: 64,
-  maxWidth: 320,
+  maxWidth: 640,
 }
 const headingAccentStyles = {
   color: "#663399",
@@ -65,7 +67,7 @@ const docLink = {
 
 // markup
 const IndexPage = () => {
-  
+
   return (
     <Layout>
       <main style={pageStyles}>
@@ -75,6 +77,7 @@ const IndexPage = () => {
         </h1>
         
         <ASAList />
+        <ASATransactions />
 
       </main>
     </Layout>
