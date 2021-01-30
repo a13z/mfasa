@@ -30,9 +30,11 @@ const Addresses = ({wallet, handleChange}) => {
 
 const AlgoSigner = (props) => {
 
-    const [wallet, setWallet] = useState([]);
-    const [ledger, setLedger] = useState('TestNet')
+    // const {currentAddressCxt, ledgerCxt, walletCxt} = React.useContext(AlgoSignerContext);
+
     const [currentAddress, setCurrentAddress] = useState("");
+    const [ledger, setLedger] = useState('TestNet')
+    const [wallet, setWallet] = useState([]);
 
     const addressOptions = wallet.map(item => ({ label: item.address, value: item.address }));
 
@@ -69,6 +71,7 @@ const AlgoSigner = (props) => {
             });
 
         }
+    
 
         fetchWallet();
 
@@ -94,7 +97,7 @@ const AlgoSigner = (props) => {
                 inputId={"address"}
                 placeholder='Address'
                 options={addressOptions} 
-                defaultValue={addressOptions[0]} 
+                defaultValue={currentAddress} 
                 onChange={handleAddressChange}
             />
 
