@@ -1,4 +1,5 @@
 import sdk from 'algosdk';
+import axios from 'axios';
 
 // const token = "<your-api-token>";
 // const server = "<http://your-sever>";
@@ -21,12 +22,12 @@ class AlgoSdk {
         name: 'testnet',
         server: sandboxServer,
         label: 'TESTNET',
-        explorer: 'https://goalseeker.purestake.io/algorand/testnet'
+        indexer: 'https://api.testnet.algoexplorer.io/idx2/'
     }, {
         name: 'mainnet',
         server: 'https://mainnet-algorand.api.purestake.io/ps1',
         label: 'MAINNET',
-        explorer: 'https://goalseeker.purestake.io/algorand/mainnet'
+        indexer: 'https://api.algoexplorer.io/idx2/'
     }];
 
     constructor() {
@@ -41,6 +42,24 @@ class AlgoSdk {
                 this.setClient(network.server);
             }
         })
+    }
+
+    async getAccountDetailsIndexer(address) {
+        console.log('getAccountDetailsIndexer ' + address);
+        const network = this.getCurrentNetwork();
+        let accountDetails;
+    
+        axios.get(network + '/v2/accounts/' + address)
+        .then((res) =>
+        {
+            accountDetails = res.data.account;
+            console.log(res.data.account);
+        })        
+        .catch((e) => {
+            console.error(e);
+        });
+
+        return accountDetails;
     }
 
     getExplorer() {
