@@ -1,13 +1,6 @@
 import React, {useState, useContext, useEffect, createContext} from 'react';
 import Select from "react-select";
-// import { AlgoSignerContext } from '../../contexts/algosigner.context';
-
-const AlgoSignerContext = createContext({
-    currentAddress: '',
-    network: 'Testnet',
-    wallet: [],
-    accountDetails: {},
-  });
+import AlgoSignerContext from '../../contexts/algosigner.context';
 
 const networkOptions = [
     { value: 'TestNet', label: 'TestNet' },
