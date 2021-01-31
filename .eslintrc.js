@@ -18,5 +18,7 @@ module.exports = {
     'no-debugger': 'warn',
     'no-console': 'warn',
     'no-alert': 'warn',
+    'react/jsx-props-no-spreading': 0,
+    'react/jsx-filename-extension': [1, { extensions: ['.js', '.jsx'] }],
   },
 };

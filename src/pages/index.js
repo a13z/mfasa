@@ -1,9 +1,13 @@
-import React from 'react';
-import { Link } from 'gatsby';
+import React, { useState, useContext, useEffect } from 'react';
+
+import axios from 'axios';
 
 import Layout from '../components/layout';
 import ASAList from '../components/ASAList/ASAList.component';
 import ASATransactions from '../components/ASATransactions/ASATransactions.component';
+import AlgoSignerContext from '../contexts/algosigner.context';
+
+import AlgoSdk from '../services/AlgoSdk';
 
 // styles
 const pageStyles = {
@@ -63,17 +67,89 @@ const docLink = {
   color: '#8954A8',
 };
 
-// markup
-const IndexPage = () => (
-  <Layout>
-    <main style={pageStyles}>
-      <title>Home Page</title>
-      <h1 style={headingStyles}>MFASA Overview</h1>
+const IndexPage = () => {
+  const ctx = useContext(AlgoSignerContext);
+  const [accountDetails, setAccountDetails] = useState();
 
-      <ASAList />
-      <ASATransactions />
-    </main>
-  </Layout>
-);
+  useEffect(() => {
+    axios
+      .get(
+        `https://api.testnet.algoexplorer.io/idx2/v2/accounts/${ctx.currentAddress}`,
+      )
+      .then((res) => {
+        setAccountDetails(res.data);
+      })
+      .catch((e) => {
+        console.error(e);
+      });
+
+    if (ctx.currentAddress) {
+      AlgoSdk.getAccountDetailsIndexer(ctx.currentAddress)
+        .then((ad) => {
+          setAccountDetails(ad);
+        })
+        .catch((e) => {
+          console.error(e);
+        });
+
+      // AlgoSdk.getAccountInformation(ctx.currentAddress).then(
+      // 	(accountDetails) => {
+      // 		console.log(accountDetails);
+      // 		setAccountDetails(accountDetails);
+      // 		const columns = Object.keys(accountDetails);
+      // 		console.log(columns);
+      // 		accountDetails['created-assets'].map((item) => {
+      // 			console.log(item.index);
+      // 			console.log(item.params.name, item.params.total);
+
+      // 			axios
+      // 				.get(
+      // 					'https://api.testnet.algoexplorer.io/idx2/v2/assets/13672793/balances'
+      // 				)
+      // 				.then((res) => {
+      // 					console.log(res);
+      // 					const newBalances = res.data.balances.map((obj) => obj.address);
+      // 					console.log(newBalances);
+      // 					setAccountDetails({ balances: newBalances });
+      // 				});
+      // 		});
+      // 	}
+      // );
+
+      // async function fetchASACreated() {
+      // 	await AlgoSigner.connect();
+
+      // 	await AlgoSigner.accounts({
+      // 		ledger: ledger,
+      // 	})
+      // 		.then((AlgoSignerWallet) => {
+      // 			console.log(JSON.stringify(AlgoSignerWallet));
+      // 			setWallet(AlgoSignerWallet);
+      // 			console.log(JSON.stringify(wallet));
+      // 		})
+      // 		.catch((e) => {
+      // 			console.error(e);
+      // 		});
+      // }
+
+      // fetchWallet();
+    }
+  }, [ctx]);
+
+  return (
+    <Layout>
+      <main style={pageStyles}>
+        <title>Home Page</title>
+        <h1 style={headingStyles}>MFASA Overview</h1>
+        {accountDetails ? (
+          <ASAList data={accountDetails.account.assets} />
+        // {/* <ASATransactions data={accountDetails} /> */}
+        ) : (
+          <h1>Select an account</h1>
+        )}
+      </main>
+    </Layout>
+  );
+};
 
 export default IndexPage;
