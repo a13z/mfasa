@@ -26,9 +26,7 @@ export default function Layout({ children }) {
         </ul>
       
       </header>
-      <AlgoSigner>
         {children}
-      </AlgoSigner>
     </div>
   )
 }

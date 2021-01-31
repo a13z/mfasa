@@ -1,5 +1,5 @@
-module.exports = {
-    plugins: [
-        new webpack.DefinePlugin({ "global.GENTLY": false })
-    ]
-}
+// module.exports = {
+//     plugins: [
+//         new webpack.DefinePlugin({ "global.GENTLY": false })
+//     ]
+// }
