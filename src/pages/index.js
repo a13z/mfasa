@@ -69,28 +69,41 @@ const docLink = {
 
 const IndexPage = () => {
   const ctx = useContext(AlgoSignerContext);
-  const [accountDetails, setAccountDetails] = useState();
+  const [accountDetails, setAccountDetails] = useState({});
 
   useEffect(() => {
-    axios
-      .get(
-        `https://api.testnet.algoexplorer.io/idx2/v2/accounts/${ctx.currentAddress}`,
-      )
-      .then((res) => {
-        setAccountDetails(res.data);
-      })
-      .catch((e) => {
-        console.error(e);
-      });
-
     if (ctx.currentAddress) {
-      AlgoSdk.getAccountDetailsIndexer(ctx.currentAddress)
-        .then((ad) => {
-          setAccountDetails(ad);
+      axios
+        .get(
+          `https://api.testnet.algoexplorer.io/idx2/v2/accounts/${ctx.currentAddress}`,
+        )
+        .then((res) => {
+          console.log(res.data.account);
+          setAccountDetails(res.data.account);
+        // res.data['created-assets'].map((item) => {
+        //   console.log(item.index);
+        //   console.log(item.params.name, item.params.total);
+        //   axios
+        //     .get(
+        //       `https://api.testnet.algoexplorer.io/idx2/v2/assets/13672793/balances`
+        //     )
+        //     .then((res) => {
+        //       console.log(res);
+        //       const newBalances = res.data.balances.map((obj) => obj.address);
+        //       console.log(newBalances);
+        //       setAccountDetails({ balances: newBalances });
         })
         .catch((e) => {
           console.error(e);
         });
+
+      // AlgoSdk.getAccountDetailsIndexer(ctx.currentAddress)
+      //   .then((ad) => {
+      //     setAccountDetails(ad);
+      //   })
+      //   .catch((e) => {
+      //     console.error(e);
+      //   });
 
       // AlgoSdk.getAccountInformation(ctx.currentAddress).then(
       // 	(accountDetails) => {
@@ -98,7 +111,7 @@ const IndexPage = () => {
       // 		setAccountDetails(accountDetails);
       // 		const columns = Object.keys(accountDetails);
       // 		console.log(columns);
-      // 		accountDetails['created-assets'].map((item) => {
+      // 		accountDetails["created-assets"].map((item) => {
       // 			console.log(item.index);
       // 			console.log(item.params.name, item.params.total);
 
@@ -132,20 +145,21 @@ const IndexPage = () => {
       // 		});
       // }
 
-      // fetchWallet();
+    // fetchWallet();
     }
   }, [ctx]);
-
   return (
     <Layout>
       <main style={pageStyles}>
         <title>Home Page</title>
         <h1 style={headingStyles}>MFASA Overview</h1>
-        {accountDetails ? (
-          <ASAList data={accountDetails.account.assets} />
-        // {/* <ASATransactions data={accountDetails} /> */}
+        { accountDetails['created-assets'] ? (
+          <>
+            <ASAList data={accountDetails['created-assets']} />
+            <ASATransactions asaList={accountDetails['created-assets']} />
+          </>
         ) : (
-          <h1>Select an account</h1>
+          <h1>Select an account or this account has not created any ASA</h1>
         )}
       </main>
     </Layout>

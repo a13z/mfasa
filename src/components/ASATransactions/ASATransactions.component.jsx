@@ -3,60 +3,83 @@ import { useTable } from 'react-table';
 import './react-table.css';
 
 import axios from 'axios';
-import AlgoSignerContext from '../../contexts/algosigner.context';
-import { AccountDetailsContext } from '../../contexts/accountDetails.context';
 
-import AlgoSdk from '../../services/AlgoSdk';
+const ASATransactions = ({ asaList }) => {
+  console.log('ASATransactions asaList', asaList);
 
-const ASATransactions = (data) => {
+  const [transactions, setTransactions] = useState([]);
+
+  useEffect(() => {
+    const asaTransactions = [];
+    console.log('asaList useEffect', asaList);
+    asaList.map((asa) => {
+      const asaId = asa.index;
+      console.log(`asaId ${asaId}`);
+      axios
+        .get(
+          `https://api.testnet.algoexplorer.io/idx2/v2/assets/${asaId}/transactions`,
+        )
+        .then((res) => {
+          console.log(res);
+          asaTransactions.push(...res.data.transactions);
+        })
+        .catch((e) => {
+          console.error(e);
+        })
+        .finally(() => {
+          console.log(asaTransactions);
+          setTransactions(asaTransactions);
+        });
+    });
+  }, []);
+
   const columns = React.useMemo(
     () => [
-      {
-        Header: 'Asset Id',
-        accessor: 'asset-transfer-transaction.asset-id', // accessor is the "key" in the data
-        width: 15,
-      },
+      // {
+      //   Header: 'Asset Id',
+      //   accessor: 'asset-transfer-transaction.asset-id', // accessor is the "key" in the data
+      // },
       {
         Header: 'TxId',
         accessor: 'id', // accessor is the "key" in the data
         width: 15,
       },
-      {
-        Header: 'Round',
-        accessor: 'confirmed-round', // accessor is the "key" in the data
-      },
-      {
-        Header: 'From',
-        accessor: 'sender',
-        width: 15,
-      },
-      {
-        Header: 'To',
-        accessor: 'asset-transfer-transaction.receiver',
-        width: 15,
-      },
-      {
-        Header: 'Amount',
-        accessor: 'asset-transfer-transaction.amount',
-      },
-      {
-        Header: 'Fee',
-        accessor: 'fee',
-      },
-      {
-        Header: 'Round time',
-        accessor: 'round-time',
-      },
+      // {
+      //   Header: 'Round',
+      //   accessor: 'confirmed-round', // accessor is the "key" in the data
+      // },
+      // {
+      //   Header: 'From',
+      //   accessor: 'sender',
+      //   width: 15,
+      // },
+      // {
+      //   Header: 'To',
+      //   accessor: 'asset-transfer-transaction.receiver',
+      //   width: 15,
+      // },
+      // {
+      //   Header: 'Amount',
+      //   accessor: 'asset-transfer-transaction.amount',
+      // },
+      // {
+      //   Header: 'Fee',
+      //   accessor: 'fee',
+      // },
+      // {
+      //   Header: 'Round time',
+      //   accessor: 'round-time',
+      // },
     ],
     [],
   );
 
+  const data = React.useMemo(
+    () => transactions,
+    [transactions],
+  );
+
   const {
-    // getTableProps,
-    // getTableBodyProps,
-    // headerGroups,
-    // rows,
-    // prepareRow,
     getTableProps,
     getTableBodyProps,
     headerGroups,
@@ -84,8 +107,8 @@ const ASATransactions = (data) => {
                   background: 'aliceblue',
                   color: 'black',
                   fontWeight: 'bold',
-                  width: '15px',
-                  maxWidth: '30px',
+                  // width: '15px',
+                  // maxWidth: '30px',
                 }}
               >
                 {column.render('Header')}
@@ -106,7 +129,8 @@ const ASATransactions = (data) => {
                     padding: '10px',
                     border: 'solid 1px gray',
                     background: 'papayawhip',
-                    width: '15px',
+                    // width: '15px',
+                    // maxWidth: '60px',
                   }}
                 >
                   {cell.render('Cell')}

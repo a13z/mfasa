@@ -7,16 +7,16 @@ const ASAList = ({ data }) => {
     () => [
       {
         Header: 'Index',
-        accessor: 'asset-id', // accessor is the "key" in the data
+        accessor: 'index', // accessor is the "key" in the data
       },
       {
         Header: 'Name',
-        accessor: 'amount',
+        accessor: 'params.name',
       },
-      // {
-      //   Header: 'Total Balance',
-      //   accessor: 'amount',
-      // },
+      {
+        Header: 'Total Supply',
+        accessor: 'params.total',
+      },
       // {
       //   Header: 'Decimals',
       //   accessor: 'params.decimals',
