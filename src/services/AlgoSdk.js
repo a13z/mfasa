@@ -1,10 +1,23 @@
 import sdk from 'algosdk';
 
+// const token = "<your-api-token>";
+// const server = "<http://your-sever>";
+// const port = 8080;
+
 // sandbox
 const token = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
 const sandboxServer = 'http://localhost';
 const port = 4001;
 
+function base64ToArrayBuffer(base64) {
+  const binary_string = window.atob(base64);
+  const len = binary_string.length;
+  const bytes = new Uint8Array(len);
+  for (let i = 0; i < len; i++) {
+    bytes[i] = binary_string.charCodeAt(i);
+  }
+  return bytes.buffer;
+}
 class AlgoSdk {
   client;
 
@@ -37,6 +50,24 @@ class AlgoSdk {
         this.setClient(network.server);
       }
     });
+  }
+
+  async getAccountDetailsIndexer(address) {
+    console.log(`getAccountDetailsIndexer ${address}`);
+    const network = this.getCurrentNetwork();
+    let accountDetails;
+
+    axios
+      .get(`${network}/v2/accounts/${address}`)
+      .then((res) => {
+        accountDetails = res.data.account;
+        console.log(res.data.account);
+      })
+      .catch((e) => {
+        console.error(e);
+      });
+
+    return accountDetails;
   }
 
   getIndexer() {
@@ -229,7 +260,7 @@ class AlgoSdk {
       genesisID: params.genesisID,
       genesisHash: params.genesisHash,
       assetURL,
-      assetMetadataHash,
+      // assetMetadataHash,
       assetDefaultFrozen,
       assetManager,
       assetReserve,
@@ -237,6 +268,11 @@ class AlgoSdk {
       assetClawback,
     };
 
+    console.log('CreateAssetTxn: ');
+    console.log(txn);
+    // let rawSignedTxn = txn.signTxn(wallet.secretKey);
+
+    // let transaction = (await this.getClient().sendRawTransaction(rawSignedTxn, {'Content-Type': 'application/x-binary'}));
     return txn;
   }
 
