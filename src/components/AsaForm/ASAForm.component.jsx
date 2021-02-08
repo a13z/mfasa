@@ -1,10 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { useForm, Controller, FormProvider } from 'react-hook-form';
-// import Header from "./Header";
-// import ReactDatePicker from "react-datepicker";
-// import NumberFormat from "react-number-format";
-// import ReactSelect from "react-select";
-// import options from "./constants/reactSelectOptions";
+
 import { makeStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import {
@@ -23,9 +19,13 @@ import {
   createMuiTheme,
   Slider,
 } from '@material-ui/core';
+import * as yup from 'yup';
+import { yupResolver } from '@hookform/resolvers/yup';
 import AlgoSignerContext from '../../contexts/algosigner.context';
 
+import FormTextFieldInput from '../FormTextFieldInput/FormTextFieldInput.component';
 import AlgoSdk from '../../services/AlgoSdk';
+
 // import "./ASAForm.style.scss";
 
 const useStyles = makeStyles((theme) => ({
@@ -41,6 +41,19 @@ const useStyles = makeStyles((theme) => ({
     margin: theme.spacing(1),
   },
 }));
+
+const validationSchema = yup.object().shape({
+  assetName: yup.string().required('Asset Name Field is Required'),
+  unitName: yup.string().required('Unit Name Field is Required'),
+  totalSupply: yup
+    .number()
+    .typeError('Total Supply must be a number')
+    .required('Total Supply Field is Required'),
+  decimals: yup
+    .number()
+    .typeError('Decimals must be a number')
+    .required('Decimals Field is Required and must be a number'),
+});
 
 const ASAForm = ({ asaId }) => {
   const ctx = useContext(AlgoSignerContext);
@@ -63,12 +76,15 @@ const ASAForm = ({ asaId }) => {
 
   const {
     register,
-    handleSubmit,
     setError,
-    errors,
     reset,
     formState: { isSubmitting },
   } = useForm();
+
+  const methods = useForm({
+    resolver: yupResolver(validationSchema),
+  });
+  const { handleSubmit, errors } = methods;
 
   const createASATx = (values) => {
     const { AlgoSigner } = window;
@@ -182,82 +198,116 @@ const ASAForm = ({ asaId }) => {
 
   const showForm = (
     <Container>
-      <div className={classes.root}>
-        <form onSubmit={onSubmit}>
-          <Grid container spacing={2}>
-            { loading ? <LinearProgress /> : showLinearProgress }
-            <Grid item xs={6}>
-              <TextField disabled={isSubmitting} fullWidth type="text" placeholder="Asset Name" name="assetName" inputRef={register({ required: true })} />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField disabled={isSubmitting} required fullWidth type="text" placeholder="Asset Unit" name="unitName" inputRef={register({ required: true })} />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField disabled={isSubmitting} fullWidth type="number" placeholder="Total Supply" name="totalSupply" inputRef={register({ required: true })} />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField disabled={isSubmitting} fullWidth type="number" placeholder="Decimals" name="decimals" inputRef={register({ required: true, min: 0 })} />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField disabled={isSubmitting} fullWidth type="url" placeholder="Asset Url" name="assetUrl" inputRef={register} />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField disabled={isSubmitting} fullWidth type="text" placeholder="Metadata" name="metadata" inputRef={register({ maxLength: 32 })} />
-            </Grid>
-            <Grid item xs={12}>
-              <FormControlLabel
-                control={(
-                  <Switch
-                    checked={defaultFrozen}
-                    onChange={handleDefaultFrozenChange}
-                    name="defaultFrozen"
-                    inputRef={register}
-                    color="primary"
-                  />
+      <FormProvider {...methods}>
+        <div className={classes.root}>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <Grid container spacing={2}>
+              { loading ? <LinearProgress /> : showLinearProgress }
+              <Grid item xs={6}>
+                <FormTextFieldInput
+                  label="Asset Name"
+                  type="text"
+                  placeholder="Asset Name"
+                  name="assetName"
+                  required
+                  errorobj={errors}
+                  disabled={isSubmitting}
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <FormTextFieldInput
+                  label="Unit Name"
+                  type="text"
+                  placeholder="Unit Name"
+                  name="unitName"
+                  required
+                  errorobj={errors}
+                  disabled={isSubmitting}
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <FormTextFieldInput
+                  label="Total Supply"
+                  type="number"
+                  placeholder="Total Supply"
+                  name="totalSupply"
+                  required
+                  errorobj={errors}
+                  disabled={isSubmitting}
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <FormTextFieldInput
+                  label="Decimals"
+                  type="number"
+                  placeholder="Decimals"
+                  name="decimals"
+                  required
+                  errorobj={errors}
+                  disabled={isSubmitting}
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <TextField disabled={isSubmitting} fullWidth type="url" placeholder="Asset Url" name="assetUrl" inputRef={register} />
+              </Grid>
+              <Grid item xs={6}>
+                <TextField disabled={isSubmitting} fullWidth type="text" placeholder="Metadata" name="metadata" inputRef={register({ maxLength: 32 })} />
+              </Grid>
+              <Grid item xs={12}>
+                <FormControlLabel
+                  control={(
+                    <Switch
+                      checked={defaultFrozen}
+                      onChange={handleDefaultFrozenChange}
+                      name="defaultFrozen"
+                      inputRef={register}
+                      color="primary"
+                    />
               )}
-                label="Frozen by default"
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <FormControlLabel
-                control={(
-                  <Switch
-                    checked={defaultSender}
-                    onChange={handleDefaultSenderChange}
-                    name="defaultSender"
-                    inputRef={register}
-                    color="primary"
-                  />
+                  label="Frozen by default"
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <FormControlLabel
+                  control={(
+                    <Switch
+                      checked={defaultSender}
+                      onChange={handleDefaultSenderChange}
+                      name="defaultSender"
+                      inputRef={register}
+                      color="primary"
+                    />
               )}
-                label="Default to Sender"
-              />
+                  label="Default to Sender"
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <TextField disabled={isSubmitting} value={managerAddress || ''} fullWidth type="text" placeholder="Manager Address" name="managerAddress" inputRef={register({ required: true, minLength: 58, maxLength: 58 })} />
+              </Grid>
+              <Grid item xs={6}>
+                <TextField disabled={isSubmitting} fullWidth type="text" value={reserveAddress || ''} placeholder="Reserve Address" name="reserveAddress" inputRef={register({ minLength: 58, maxLength: 58 })} />
+              </Grid>
+              <Grid item xs={6}>
+                <TextField disabled={isSubmitting} fullWidth type="text" value={freezeAddress || ''} placeholder="Freeze Address" name="freezeAddress" inputRef={register({ minLength: 58, maxLength: 58 })} />
+              </Grid>
+              <Grid item xs={6}>
+                <TextField disabled={isSubmitting} fullWidth type="text" value={clawbackAddress || ''} placeholder="Clawback Address" name="clawbackAddress" inputRef={register({ minLength: 58, maxLength: 58 })} />
+              </Grid>
+              <Grid item xs={3} spacing={9}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleSubmit(onSubmit)}
+                  disabled={isSubmitting}
+                >
+                  SUBMIT
+                </Button>
+              </Grid>
             </Grid>
-            <Grid item xs={6}>
-              <TextField disabled={isSubmitting} value={managerAddress || ''} fullWidth type="text" placeholder="Manager Address" name="managerAddress" inputRef={register({ required: true, minLength: 58, maxLength: 58 })} />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField disabled={isSubmitting} fullWidth type="text" value={reserveAddress || ''} placeholder="Reserve Address" name="reserveAddress" inputRef={register({ minLength: 58, maxLength: 58 })} />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField disabled={isSubmitting} fullWidth type="text" value={freezeAddress || ''} placeholder="Freeze Address" name="freezeAddress" inputRef={register({ minLength: 58, maxLength: 58 })} />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField disabled={isSubmitting} fullWidth type="text" value={clawbackAddress || ''} placeholder="Clawback Address" name="clawbackAddress" inputRef={register({ minLength: 58, maxLength: 58 })} />
-            </Grid>
-            <Grid item xs={3} spacing={9}>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleSubmit(onSubmit)}
-                disabled={isSubmitting}
-              >
-                SUBMIT
-              </Button>
-            </Grid>
-          </Grid>
 
-        </form>
-      </div>
+          </form>
+        </div>
+      </FormProvider>
     </Container>
   );
   return (
