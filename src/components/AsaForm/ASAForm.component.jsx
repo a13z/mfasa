@@ -4,18 +4,12 @@ import { makeStyles, createStyles } from '@material-ui/core/styles';
 
 import {
   TextField,
-  Checkbox,
   Container,
   Button,
-  Select,
   Grid,
-  MenuItem,
-  Switch,
   FormControlLabel,
   LinearProgress,
 } from '@material-ui/core';
-
-import Alert from '@material-ui/lab/Alert';
 
 import { useForm, Controller, FormProvider } from 'react-hook-form';
 
@@ -26,7 +20,6 @@ import { useSnackbar } from 'notistack';
 
 import AlgoSignerContext from '../../contexts/algosigner.context';
 
-import FormTextFieldInput from '../FormTextFieldInput/FormTextFieldInput.component';
 import AlgoSdk from '../../services/AlgoSdk';
 
 // import "./ASAForm.style.scss";
