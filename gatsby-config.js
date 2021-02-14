@@ -28,6 +28,15 @@ module.exports = {
         },
       },
     },
+    {
+      resolve: 'gatsby-plugin-material-ui',
+      options: {
+        stylesProvider: {
+          injectFirst: true,
+        },
+      },
+    },
+    'mfasa-mui-theme',
   ],
   flags: {
     DEV_SSR: false,
