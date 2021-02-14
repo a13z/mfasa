@@ -1,7 +1,9 @@
 import React from 'react';
 import { useTable } from 'react-table';
 
-const ASAList = ({ data }) => {
+import { CircularProgress } from '@material-ui/core';
+
+const ASAList = ({ data, loading }) => {
   console.log('// data ', data);
   const columns = React.useMemo(
     () => [
@@ -50,37 +52,42 @@ const ASAList = ({ data }) => {
   } = useTable({ columns, data });
 
   return (
-    <table {...getTableProps()}>
-      <thead>
-        {headerGroups.map((headerGroup) => (
-          <tr {...headerGroup.getHeaderGroupProps()}>
-            {headerGroup.headers.map((column) => (
-              <th
-                {...column.getHeaderProps()}
-              >
-                {column.render('Header')}
-              </th>
-            ))}
-          </tr>
-        ))}
-      </thead>
-      <tbody {...getTableBodyProps()}>
-        {rows.map((row) => {
-          prepareRow(row);
-          return (
-            <tr {...row.getRowProps()}>
-              {row.cells.map((cell) => (
-                <td
-                  {...cell.getCellProps()}
-                >
-                  {cell.render('Cell')}
-                </td>
+    <>
+      {loading ? <CircularProgress />
+        : (
+          <table {...getTableProps()}>
+            <thead>
+              {headerGroups.map((headerGroup) => (
+                <tr {...headerGroup.getHeaderGroupProps()}>
+                  {headerGroup.headers.map((column) => (
+                    <th
+                      {...column.getHeaderProps()}
+                    >
+                      {column.render('Header')}
+                    </th>
+                  ))}
+                </tr>
               ))}
-            </tr>
-          );
-        })}
-      </tbody>
-    </table>
+            </thead>
+            <tbody {...getTableBodyProps()}>
+              {rows.map((row) => {
+                prepareRow(row);
+                return (
+                  <tr {...row.getRowProps()}>
+                    {row.cells.map((cell) => (
+                      <td
+                        {...cell.getCellProps()}
+                      >
+                        {cell.render('Cell')}
+                      </td>
+                    ))}
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        )}
+    </>
   );
 };
 export default ASAList;

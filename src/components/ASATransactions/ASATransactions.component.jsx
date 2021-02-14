@@ -1,4 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react';
+
+import { CircularProgress } from '@material-ui/core';
+
 import { useTable } from 'react-table';
 import './react-table.css';
 
@@ -8,6 +11,7 @@ const ASATransactions = ({ asaList }) => {
   console.log('ASATransactions asaList', asaList);
 
   const [transactions, setTransactions] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const asaTransactions = [];
@@ -21,14 +25,16 @@ const ASATransactions = ({ asaList }) => {
         )
         .then((res) => {
           console.log(res);
+          setLoading(false);
           asaTransactions.push(...res.data.transactions);
+          setTransactions(asaTransactions);
         })
         .catch((e) => {
           console.error(e);
         })
         .finally(() => {
+          setLoading(false);
           console.log(asaTransactions);
-          setTransactions(asaTransactions);
         });
     });
   }, []);
@@ -95,37 +101,42 @@ const ASATransactions = ({ asaList }) => {
   } = useTable({ columns, data });
 
   return (
-    <table {...getTableProps()}>
-      <thead>
-        {headerGroups.map((headerGroup) => (
-          <tr {...headerGroup.getHeaderGroupProps()}>
-            {headerGroup.headers.map((column) => (
-              <th
-                {...column.getHeaderProps()}
-              >
-                {column.render('Header')}
-              </th>
-            ))}
-          </tr>
-        ))}
-      </thead>
-      <tbody {...getTableBodyProps()}>
-        {rows.map((row) => {
-          prepareRow(row);
-          return (
-            <tr {...row.getRowProps()}>
-              {row.cells.map((cell) => (
-                <td
-                  {...cell.getCellProps()}
-                >
-                  {cell.render('Cell')}
-                </td>
+    <>
+      {loading ? <CircularProgress />
+        : (
+          <table {...getTableProps()}>
+            <thead>
+              {headerGroups.map((headerGroup) => (
+                <tr {...headerGroup.getHeaderGroupProps()}>
+                  {headerGroup.headers.map((column) => (
+                    <th
+                      {...column.getHeaderProps()}
+                    >
+                      {column.render('Header')}
+                    </th>
+                  ))}
+                </tr>
               ))}
-            </tr>
-          );
-        })}
-      </tbody>
-    </table>
+            </thead>
+            <tbody {...getTableBodyProps()}>
+              {rows.map((row) => {
+                prepareRow(row);
+                return (
+                  <tr {...row.getRowProps()}>
+                    {row.cells.map((cell) => (
+                      <td
+                        {...cell.getCellProps()}
+                      >
+                        {cell.render('Cell')}
+                      </td>
+                    ))}
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        )}
+    </>
   );
 };
 
