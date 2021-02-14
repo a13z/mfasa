@@ -14,8 +14,8 @@ const Header = ({ siteTitle }) => (
       <h3>
         <ul style={{ listStyle: 'none', float: 'left' }}>
           <ListLink to="/">{siteTitle}</ListLink>
-          <ListLink to="/asamanager/">ASA Manager</ListLink>
-          <ListLink to="/asaconfig/">ASA Config</ListLink>
+          <ListLink to="/asamanager/">ASA manager</ListLink>
+          <ListLink to="/asaconfig/">ASA config</ListLink>
           <ListLink to="/reports/">Reports</ListLink>
         </ul>
       </h3>
