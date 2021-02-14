@@ -1,30 +1,23 @@
 import React from 'react';
-import { Link } from 'gatsby';
+import PropTypes from 'prop-types';
 
-import AlgoSigner from './AlgoSigner/AlgoSigner.component';
+import Header from './header';
+import './layout.css';
 
-const ListLink = (props) => (
-  <li style={{ display: 'inline-block', marginRight: '1rem' }}>
-    <Link to={props.to}>{props.children}</Link>
-  </li>
+const Layout = ({ children }) => (
+  <>
+    <Header siteTitle="MFASA" />
+    <main>{children}</main>
+    <footer>
+      © MFASA
+      {' '}
+      {new Date().getFullYear()}
+    </footer>
+  </>
 );
 
-export default function Layout({ children }) {
-  return (
-    <div style={{ margin: 'auto', maxWidth: 1200, padding: '0 1rem' }}>
-      <header style={{ marginBottom: '1.5rem' }}>
-        <Link to="/" style={{ textShadow: 'none', backgroundImage: 'none' }}>
-          <h3 style={{ display: 'inline' }}>MFASA</h3>
-        </Link>
-        <ul style={{ listStyle: 'none', float: 'right' }}>
-          <ListLink to="/">Home</ListLink>
-          <ListLink to="/asamanager/">ASA Manager</ListLink>
-          <ListLink to="/asaconfig/">ASA Config</ListLink>
-          <ListLink to="/reports/">Reports</ListLink>
-          <br />
-        </ul>
-      </header>
-      {children}
-    </div>
-  );
-}
+Layout.propTypes = {
+  children: PropTypes.node.isRequired,
+};
+
+export default Layout;
