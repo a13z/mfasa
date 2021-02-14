@@ -84,11 +84,13 @@ const AlgoSigner = (props) => {
 
   return (
     <AlgoSignerContext.Provider
-      value={{
+      value={
+        {
 			  currentAddress,
 			  ledger,
 			  wallet,
-      }}
+        }
+      }
     >
       {/* TODO This doesn't work and don't know why  */}
       {/* <Ledger ledger={ledger} onChange={handleChange}/> */}
@@ -101,6 +103,10 @@ const AlgoSigner = (props) => {
         default={ledger}
         onChange={handleLedgerChange}
       />
+      <p>
+        Current selected network:
+        <b>{ledger}</b>
+      </p>
       <Select
         inputId="address"
         placeholder="Address"
@@ -108,11 +114,6 @@ const AlgoSigner = (props) => {
         defaultValue={currentAddress}
         onChange={handleAddressChange}
       />
-
-      <p>
-        Current selected network:
-        <b>{ledger}</b>
-      </p>
       <p>
         Current selected address:
         <b>{currentAddress}</b>
