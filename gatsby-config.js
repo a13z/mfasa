@@ -39,6 +39,6 @@ module.exports = {
     'mfasa-mui-theme',
   ],
   flags: {
-    DEV_SSR: false,
+    DEV_SSR: true,
   },
 };
