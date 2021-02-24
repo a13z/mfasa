@@ -1,4 +1,6 @@
 import React from 'react';
+import { Link } from 'gatsby';
+
 import { useTable } from 'react-table';
 
 import { CircularProgress } from '@material-ui/core';
@@ -18,6 +20,10 @@ const ASAList = ({ data, loading }) => {
       {
         Header: 'Total Supply',
         accessor: 'params.total',
+      },
+      {
+        accessor: 'manage',
+        Cell: ({ cell: { value }, row: { original } }) => <Link to={`asamanager/${original.index}`}>manage</Link>,
       },
       // {
       //   Header: 'Decimals',
