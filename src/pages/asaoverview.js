@@ -1,5 +1,4 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { Router } from '@reach/router';
 
 import axios from 'axios';
 
@@ -9,14 +8,9 @@ import ASAList from '../components/ASAList/ASAList.component';
 import ASATransactions from '../components/ASATransactions/ASATransactions.component';
 import AlgoSignerContext from '../contexts/algosigner.context';
 
-import ASAOverview from './asaoverview';
-import ASAManager from './asamanager';
-import ASAConfig from './asaconfig';
-import Reports from './reports';
-
 import AlgoSdk from '../services/AlgoSdk';
 
-const IndexPage = (props) => {
+const ASAOverview = () => {
   const ctx = useContext(AlgoSignerContext);
   const [accountDetails, setAccountDetails] = useState({});
   const [loading, setLoading] = useState(true);
@@ -51,15 +45,22 @@ const IndexPage = (props) => {
     }
   }, [ctx]);
   return (
-    <Layout>
-      <Router>
-        <ASAOverview path="/" />
-        <ASAManager path="/asamanager/:assetId" />
-        <ASAConfig path="/asaconfig" />
-        <Reports path="/reports" />
-      </Router>
-    </Layout>
+    <>
+      <title>ASA Overview</title>
+      <h2>ASA Overview</h2>
+      <Container>
+        { accountDetails['created-assets'] ? (
+          <>
+            <ASAList data={accountDetails['created-assets']} loading={loading} />
+            <h2>Transactions</h2>
+            <ASATransactions asaList={accountDetails['created-assets']} loading={loading} />
+          </>
+        ) : (
+          <h1>Select an account or this account has not created any ASA</h1>
+        )}
+      </Container>
+    </>
   );
 };
 
-export default IndexPage;
+export default ASAOverview;
