@@ -3,16 +3,20 @@ import sdk from 'algosdk';
 class AlgoSdk {
   client;
 
+  clientV2;
+
+  indexer;
+
   network;
 
   networks = [
     {
       name: 'testnet',
       server: `${process.env.GATSBY_ALGOD_TESTNET_URL}`,
-      port: `${process.env.GATSBY_ALGOD_TESTNET_TOKEN}`,
+      port: `${process.env.GATSBY_ALGOD_TESTNET_PORT}`,
       token: `${process.env.GATSBY_ALGOD_TESTNET_TOKEN}`,
       label: 'TESTNET',
-      indexer: '`${process.env.GATSBY_ALGOD_TESTNET_URL}`:8980',
+      indexer: `${process.env.GATSBY_ALGOD_TESTNET_URL}:8980`,
     },
     {
       name: 'mainnet',
@@ -32,6 +36,8 @@ class AlgoSdk {
       if (network.name === name) {
         this.network = network;
         this.setClient(network);
+        this.setClientV2(network);
+        this.setIndexer(network);
       }
     });
   }
@@ -54,11 +60,6 @@ class AlgoSdk {
     return accountDetails;
   }
 
-  getIndexer() {
-    const network = this.getCurrentNetwork();
-    return this.network.indexer;
-  }
-
   getAssetUrl(id) {
     return `${this.getExplorer()}/asset/${id}`;
   }
@@ -68,11 +69,31 @@ class AlgoSdk {
   }
 
   setClient(network) {
-    this.client = new sdk.Algodv2(network.token, network.server, network.port);
+    console.log(network);
+    this.client = new sdk.Algod(network.token, network.server, network.port);
+    console.log(this.client);
+  }
+
+  setClientV2(network) {
+    console.log(network);
+    this.clientV2 = new sdk.Algodv2(network.token, network.server, network.port);
+    console.log(this.clientV2);
+  }
+
+  setIndexer(network) {
+    this.indexer = new sdk.Indexer(network.token, network.server, 8980);
   }
 
   getClient() {
     return this.client;
+  }
+
+  getClientV2() {
+    return this.clientV2;
+  }
+
+  getIndexer() {
+    return this.indexer;
   }
 
   mnemonicToSecretKey(mnemonic) {
@@ -80,11 +101,13 @@ class AlgoSdk {
   }
 
   async getAccountInformation(address) {
-    return await this.getClient().accountInformation(address).do();
+    console.log('getAccountInformation');
+    return await this.getClientV2().accountInformation(address).do();
   }
 
   async getAssetInformation(assetID) {
-    return await this.getClient().assetInformation(assetID);
+    console.log('getAssetInformation');
+    return this.getClient().assetInformation(assetID);
   }
 
   async getSuggestedTxParams() {
@@ -96,7 +119,7 @@ class AlgoSdk {
       genesisHash: '',
     };
 
-    const txParams = await this.getClient().getTransactionParams().do();
+    const txParams = await this.getClientV2().getTransactionParams().do();
     console.log('Algorand suggested tx parameters: %o', params);
 
     params.firstRound = txParams.firstRound;
@@ -110,11 +133,11 @@ class AlgoSdk {
 
   // Function used to wait for a tx confirmation
   async waitForConfirmation(txId) {
-    const response = await this.getClient().status().do();
+    const response = await this.getClientV2().status().do();
     let lastround = response['last-round'];
     let confirmedRound;
     while (true) {
-      const pendingInfo = await this.getClient().pendingTransactionInformation(txId).do();
+      const pendingInfo = await this.getClientV2().pendingTransactionInformation(txId).do();
       if (pendingInfo['confirmed-round'] !== null && pendingInfo['confirmed-round'] > 0) {
         // Got the completed Transaction
         confirmedRound = pendingInfo['confirmed-round'];
@@ -122,7 +145,7 @@ class AlgoSdk {
         break;
       }
       lastround++;
-      await this.getClient().statusAfterBlock(lastround).do();
+      await this.getClientV2().statusAfterBlock(lastround).do();
     }
     return confirmedRound;
   }
@@ -134,7 +157,7 @@ class AlgoSdk {
     //    .assetID(assetIndex).do();
     // and in the loop below use this to extract the asset for a particular account
     // accountInfo['accounts'][idx][account]);
-    const accountInfo = await this.getClient().accountInformation(account).do();
+    const accountInfo = await this.getClientV2().accountInformation(account).do();
     for (let idx = 0; idx < accountInfo['created-assets'].length; idx++) {
       const scrutinizedAsset = accountInfo['created-assets'][idx];
       if (scrutinizedAsset.index == assetid) {
@@ -153,7 +176,7 @@ class AlgoSdk {
     //    .assetID(assetIndex).do();
     // and in the loop below use this to extract the asset for a particular account
     // accountInfo['accounts'][idx][account]);
-    const accountInfo = await this.getClient().accountInformation(account).do();
+    const accountInfo = await this.getClientV2().accountInformation(account).do();
     for (let idx = 0; idx < accountInfo.assets.length; idx++) {
       const scrutinizedAsset = accountInfo.assets[idx];
       if (scrutinizedAsset['asset-id'] == assetid) {
@@ -178,9 +201,73 @@ class AlgoSdk {
     console.log('Txn encoded with Algosdk');
     console.log(rawSignedTxnE);
 
-    const transaction = await this.getClient().sendRawTransaction(rawSignedTxnE).do();
-    console.log(transaction);
+    try {
+      const transaction = await this.getClientV2().sendRawTransaction(rawSignedTxnE).do();
+      console.log(transaction);
+      return transaction;
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
+  async createAlgoSignerTransaction(type, from, to, amount, note, assetIndex) {
+    const params = await this.getSuggestedTxParams();
+
+    const assetRevocationTarget = undefined;
+    const closeRemainderTo = undefined;
+
+    const transaction = {
+      type: undefined,
+      from,
+      note,
+      fee: params.fee,
+      // flatFee: true,
+      firstRound: params.firstRound,
+      lastRound: params.lastRound,
+      genesisID: params.genesisID,
+      genesisHash: params.genesisHash,
+      assetRevocationTarget,
+      closeRemainderTo,
+    };
+
+    switch (type) {
+      case 'config':
+        transaction.type = 'acfg';
+        transaction.to = to;
+        break;
+      case 'send':
+        transaction.type = 'axfer';
+        transaction.to = to;
+        transaction.amount = amount;
+        transaction.assetIndex = assetIndex;
+        break;
+      case 'freeze':
+        transaction.type = 'afrz';
+        delete transaction.to;
+        transaction.freezeAccount = to;
+        transaction.assetIndex = assetIndex;
+        transaction.freezeState = true;
+        break;
+      case 'unfreeze':
+        transaction.type = 'afrz';
+        delete transaction.to;
+        transaction.freezeAccount = to;
+        transaction.assetIndex = assetIndex;
+        transaction.freezeState = false;
+        break;
+      case 'revoke':
+        transaction.type = 'axfer';
+        transaction.to = to;
+        transaction.amount = amount;
+        transaction.assetIndex = assetIndex;
+        transaction.assetRevocationTarget = to;
+        break;
+      default:
+        console.log('createAlgoSignerTransaction function: missing transaction type');
+        break;
+    }
+    console.log('createAlgoSignerTransaction function: Transaction created');
+    console.log(transaction);
     return transaction;
   }
 
@@ -234,6 +321,7 @@ class AlgoSdk {
     console.log('CreateAssetTxn: ');
     console.log(txn);
 
+    // NOTE: Using algosdk method Algosigner doesn't sign it
     const txnd = sdk.makeAssetCreateTxnWithSuggestedParams(
       sender,
       note,
@@ -289,7 +377,7 @@ class AlgoSdk {
 
     const rawSignedTxn = txn.signTxn(wallet.secretKey);
 
-    const transaction = await this.getClient().sendRawTransaction(rawSignedTxn, {
+    const transaction = await this.getClientV2().sendRawTransaction(rawSignedTxn, {
       'Content-Type': 'application/x-binary',
     });
     return transaction;
@@ -351,34 +439,48 @@ class AlgoSdk {
     return transaction;
   }
 
-  async sendAssets(wallet, assetId, recipient, amount) {
-    const cp = await this.getChangingParams();
+  async sendAssets(sender, assetId, recipient, amount) {
+    const params = await this.getSuggestedTxParams();
 
-    const note = new Uint8Array(Buffer.from('MFASA', 'base64'));
-    const sender = wallet.address;
-    const revocationTarget = undefined;
+    const note = 'MFASA';
+    const assetRevocationTarget = undefined;
     const closeRemainderTo = undefined;
 
-    const txn = sdk.makeAssetTransferTxn(
-      sender,
-      recipient,
-      closeRemainderTo,
-      revocationTarget,
-      cp.fee,
+    const transaction = {
+      from: sender,
+      to: recipient,
+      assetIndex: assetId,
       amount,
-      cp.firstRound,
-      cp.lastRound,
       note,
-      cp.genHash,
-      cp.genID,
-      assetId,
-    );
+      type: 'axfer',
+      fee: params.fee,
+      // flatFee: true,
+      firstRound: params.firstRound,
+      lastRound: params.lastRound,
+      genesisID: params.genesisID,
+      genesisHash: params.genesisHash,
+      assetRevocationTarget,
+      closeRemainderTo,
+    };
 
-    const rawSignedTxn = txn.signTxn(wallet.secretKey);
+    // AlgoSigner doesn't like this approach
+    // const transaction = sdk.makeAssetTransferTxnWithSuggestedParams(
+    //   sender,
+    //   recipient,
+    //   closeRemainderTo,
+    //   revocationTarget,
+    //   amount,
+    //   note,
+    //   assetId,
+    //   params,
+    // );
 
-    const transaction = await this.getClient().sendRawTransaction(rawSignedTxn, {
-      'Content-Type': 'application/x-binary',
-    });
+    // name,tag,appArgs.
+    // transaction.from = sender;
+    // transaction.to = recipient;
+    // delete transaction.name;
+    // delete transaction.tag;
+    // delete transaction.appArgs;
     return transaction;
   }
 
