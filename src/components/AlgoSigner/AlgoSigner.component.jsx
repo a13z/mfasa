@@ -1,7 +1,14 @@
 import React, {
   useState, useContext, useEffect, createContext,
 } from 'react';
-import Select from 'react-select';
+// import Select from 'react-select';
+import { makeStyles } from '@material-ui/core/styles';
+import InputLabel from '@material-ui/core/InputLabel';
+import MenuItem from '@material-ui/core/MenuItem';
+import FormHelperText from '@material-ui/core/FormHelperText';
+import FormControl from '@material-ui/core/FormControl';
+import Select from '@material-ui/core/Select';
+
 import AlgoSignerContext from '../../contexts/algosigner.context';
 
 const networkOptions = [
@@ -9,33 +16,19 @@ const networkOptions = [
   { id: 2, value: 'MainNet', label: 'MainNet' },
 ];
 
-const Ledger = (handleChange) => (
-  <Select
-    options={networkOptions}
-    defaultValue={networkOptions[0]}
-    onChange={handleChange}
-  />
-);
-
-const Addresses = ({ wallet, handleChange }) => {
-  console.log(wallet);
-  const addressesOptions = wallet.map((item) => ({
-    label: item.address,
-    value: item.address,
-  }));
-
-  console.log(addressesOptions);
-  return (
-    <Select
-      options={addressesOptions}
-      defaultValue={addressesOptions[0]}
-      onChange={handleChange}
-    />
-  );
-};
+const useStyles = makeStyles((theme) => ({
+  formControl: {
+    margin: theme.spacing(1),
+    minWidth: 200,
+  },
+  selectEmpty: {
+    marginTop: theme.spacing(2),
+  },
+}));
 
 const AlgoSigner = (props) => {
   // const {currentAddressCxt, ledgerCxt, walletCxt} = React.useContext(AlgoSignerContext);
+  const classes = useStyles();
 
   const [currentAddress, setCurrentAddress] = useState('');
   const [ledger, setLedger] = useState('');
@@ -85,50 +78,31 @@ const AlgoSigner = (props) => {
         wallet,
       }}
     >
-      {/* TODO This doesn't work and don't know why  */}
-      {/* <Ledger ledger={ledger} onChange={handleChange}/> */}
-      {/* <Addresses wallet={wallet} onChange={handleChange}/> */}
-
-      {/* <Select
-        inputId="network"
-        placeholder="Network"
-        options={networkOptions}
-        default={ledger}
-        onChange={handleLedgerChange}
-      /> */}
       <select name="network" id="network" onChange={handleLedgerChange}>
         <option value="">Select a network</option>
         {networkOptions.map((n) => (
-          <option id={n.id} value={n.value}>
+          <option key={n.id} id={n.id} value={n.value}>
             {n.label}
           </option>
         ))}
       </select>
-      <p>
-        Current selected network:
-        <b>{ledger}</b>
-      </p>
-
-      {/* <Select
-        inputId="address"
-        placeholder="Address"
-        options={addressOptions}
-        defaultValue={currentAddress}
-        onChange={handleAddressChange}
-      /> */}
       {ledger && (
       <div>
-
         <select name="address" id="address" onChange={handleAddressChange}>
           <option value="">Select an address</option>
           {wallet.map((item) => (
-            <option value={item.address}>{item.address}</option>
+            <option key={item.address} value={item.address}>{item.address}</option>
           ))}
         </select>
-        <p>
+        <div>
+          Current selected network:
+          {' '}
+          <b>{ledger}</b>
+          {' '}
           Current selected address:
+          {' '}
           <b>{currentAddress}</b>
-        </p>
+        </div>
       </div>
       )}
 
