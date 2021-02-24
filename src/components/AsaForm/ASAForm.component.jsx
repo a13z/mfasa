@@ -66,7 +66,7 @@ const validationSchema = yup.object().shape({
     .required('Unit Name Field is Required'),
   totalSupply: yup
     .number()
-    .max()
+    .max(10000000000000000000)
     .typeError('Total Supply must be a number')
     .required('Total Supply Field is Required'),
   asaUrl: yup
@@ -426,14 +426,14 @@ const ASAForm = ({ asaId }) => {
                     inputRef={register}
                   />
                 </Grid>
-                <Grid item spacing={8}>
+                <Grid item>
                   <Button
                     variant="contained"
                     color="primary"
                     onClick={handleSubmit(onSubmit)}
                     fullWidth
                     disabled={isSubmitting}
-                    inputRef={register}
+
                   >
                     SUBMIT
                   </Button>
