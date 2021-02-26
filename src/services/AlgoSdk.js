@@ -12,11 +12,13 @@ class AlgoSdk {
   networks = [
     {
       name: 'testnet',
-      server: `${process.env.GATSBY_ALGOD_TESTNET_URL}`,
-      port: `${process.env.GATSBY_ALGOD_TESTNET_PORT}`,
-      token: `${process.env.GATSBY_ALGOD_TESTNET_TOKEN}`,
       label: 'TESTNET',
-      indexer: `${process.env.GATSBY_ALGOD_TESTNET_URL}:8980`,
+      algodServer: `${process.env.GATSBY_ALGOD_TESTNET_URL}`,
+      algodPort: `${process.env.GATSBY_ALGOD_TESTNET_PORT}`,
+      algodToken: `${process.env.GATSBY_ALGOD_TESTNET_TOKEN}`,
+      indexerServer: `${process.env.GATSBY_INDEXER_TESTNET_URL}`,
+      indexerPort: `${process.env.GATSBY_INDEXER_TESTNET_PORT}`,
+      indexerToken: `${process.env.GATSBY_INDEXER_TESTNET_TOKEN}`,
     },
     {
       name: 'mainnet',
@@ -70,18 +72,18 @@ class AlgoSdk {
 
   setClient(network) {
     console.log(network);
-    this.client = new sdk.Algod(network.token, network.server, network.port);
+    this.client = new sdk.Algod(network.algodToken, network.algodServer, network.algodPort);
     console.log(this.client);
   }
 
   setClientV2(network) {
     console.log(network);
-    this.clientV2 = new sdk.Algodv2(network.token, network.server, network.port);
+    this.clientV2 = new sdk.Algodv2(network.algodToken, network.algodServer, network.algodPort);
     console.log(this.clientV2);
   }
 
   setIndexer(network) {
-    this.indexer = new sdk.Indexer(network.token, network.server, 8980);
+    this.indexer = new sdk.Indexer(network.indexerToken, network.indexerServer, network.indexerPort);
   }
 
   getClient() {
