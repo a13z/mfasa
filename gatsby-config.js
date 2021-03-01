@@ -29,10 +29,11 @@ module.exports = {
       },
     },
     {
-      resolve: 'gatsby-plugin-material-ui',
+      resolve: 'gatsby-theme-material-ui',
       options: {
-        stylesProvider: {
-          injectFirst: true,
+        stylesConfig: {
+          // disableAutoprefixing: true,
+          // disableMinification: true
         },
       },
     },

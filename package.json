@@ -30,6 +30,7 @@
     "gatsby": "^2.26.1",
     "gatsby-plugin-material-ui": "^2.1.10",
     "gatsby-plugin-prettier-eslint": "^1.0.4",
+    "gatsby-theme-material-ui": "^1.0.13",
     "moment": "^2.29.1",
     "notistack": "^1.0.3",
     "prettier": "^2.2.1",
