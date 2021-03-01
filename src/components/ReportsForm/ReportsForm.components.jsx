@@ -10,6 +10,7 @@ import {
 import {
   TextField,
   Container,
+  Box,
   Button,
   Grid,
   InputLabel,
@@ -36,6 +37,8 @@ import AlgoSdk from '../../services/AlgoSdk';
 const useStyles = makeStyles((theme) => createStyles({
   root: {
     flexGrow: 1,
+    whiteSpace: 'unset',
+    wordBreak: 'break-all',
   },
   paper: {
     padding: theme.spacing(2),
@@ -45,6 +48,10 @@ const useStyles = makeStyles((theme) => createStyles({
   container: {
     display: 'flex',
     flexWrap: 'wrap',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: '100%',
+    width: '100%',
   },
   textField: {
     marginLeft: theme.spacing(1),
@@ -64,6 +71,13 @@ const useStyles = makeStyles((theme) => createStyles({
   },
   extendedIcon: {
     marginRight: theme.spacing(1),
+  },
+  formControl: {
+    margin: theme.spacing(1),
+    minWidth: 120,
+  },
+  selectEmpty: {
+    marginTop: theme.spacing(2),
   },
 }));
 
@@ -129,7 +143,7 @@ export default function ReportsForm(props) {
   const [transactions, setTransactions] = useState([]);
   const [response, setResponse] = useState({});
   const [submitted, setSubmitted] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [selectedFromDate, setSelectedFromDate] = React.useState();
   const [selectedToDate, setSelectedToDate] = React.useState();
 
@@ -154,14 +168,14 @@ export default function ReportsForm(props) {
   });
 
   const fetchTransactions = async ({
-    address, asaId = '13672793', fromDate, toDate, minBalance, maxBalance, transactionType,
+    address, asset, fromDate, toDate, minBalance, maxBalance, transactionType,
   }) => {
-    console.log(asaId);
+    console.log(asset);
     if (transactionType === 'all') {
       transactionType = '';
     }
 
-    const transactionsResults = await AlgoSdk.indexer.lookupAssetTransactions(asaId)
+    const transactionsResults = await AlgoSdk.indexer.lookupAssetTransactions(asset)
       .address(address)
       .txType(transactionType)
       .beforeTime(toDate)
@@ -199,11 +213,18 @@ export default function ReportsForm(props) {
   }, [ctx]);
 
   return (
-    <Container>
+    <div>
       { loading ? <LinearProgress />
         : (
-          <div>
-            <form>
+          <Grid
+            container
+            spacing={0}
+            align="center"
+            justify="center"
+            alignItems="center"
+          >
+
+            <form className={classes.container}>
               <MuiPickersUtilsProvider utils={DateFnsUtils}>
 
                 <Grid container spacing={4}>
@@ -257,121 +278,119 @@ export default function ReportsForm(props) {
                     )}
                     />
                   </Grid>
-
-                  <Grid container spacing={4}>
-                    <Grid item xs={6}>
-                      <FormControl fullWidth>
-                        <InputLabel
-                          htmlFor="aset-select"
-                          id="asset-input-label"
-                        >
-                          Select Asset
-                        </InputLabel>
-                        <Controller
-                          control={control}
-                          name="asset"
-                          defaultValue=""
-                          as={(
-                            <Select
-                              id="asset-select"
-                            >
-                              {assetList.map((asset) => (
-                                <MenuItem key={asset.index} value={asset.index}>
-                                  {asset.params.name}
-                                </MenuItem>
-                              ))}
-                            </Select>
-                      )}
-                        />
-                        {!!errors.asset && <FormHelperText>Select an Asset</FormHelperText>}
-                      </FormControl>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <FormControl fullWidth>
-                        <InputLabel htmlFor="transaction-type-select" id="transaction-type-select">
-                          Select Transaction Type
-                        </InputLabel>
-                        <Controller
-                          control={control}
-                          name="transactionType"
-                          defaultValue="all"
-                          as={(
-                            <Select id="transaction-type-select">
-                              {transactionTypes.map((type) => (
-                                <MenuItem key={type.value} value={type.value}>
-                                  {type.text}
-                                </MenuItem>
-                              ))}
-                            </Select>
-                      )}
-                        />
-                      </FormControl>
-                    </Grid>
-                  </Grid>
-                  <Grid container spacing={4}>
-                    <Grid item xs={12}>
-                      <TextField
-                        label="Address"
-                        type="text"
-                        placeholder="Address"
-                        name="address"
-                        fullWidth
-                        disabled={isSubmitting}
-                        inputRef={register}
-                        error={!!errors.address}
-                        helperText={errors.address ? errors.address.message : ''}
-                      />
-                    </Grid>
-                  </Grid>
-                  <Grid container spacing={4}>
-                    <Grid item xs={6}>
-                      <TextField
-                        label="Min Balance"
-                        type="number"
-                        placeholder="Min Balance"
-                        name="minBalance"
-                        fullWidth
-                        disabled={isSubmitting}
-                        inputRef={register}
-                        error={!!errors.minBalance}
-                        helperText={errors.minBalance ? errors.minBalance.message : ''}
-                      />
-                    </Grid>
-                    <Grid item xs={6}>
-                      <TextField
-                        label="Max Balance"
-                        type="number"
-                        placeholder="Max Balance"
-                        name="maxBalance"
-                        fullWidth
-                        disabled={isSubmitting}
-                        inputRef={register}
-                        error={!!errors.maxBalance}
-                        helperText={errors.maxBalance ? errors.maxBalance.message : ''}
-                      />
-                    </Grid>
-                  </Grid>
-                  <Grid container><Grid item /></Grid>
-                  <Grid container>
-                    <Grid item xs={10} />
-                    <Grid item xs={2}>
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={handleSubmit(onSubmit)}
-                        fullWidth
-                        disabled={isSubmitting}
+                </Grid>
+                <Grid container spacing={4}>
+                  <Grid item xs={6}>
+                    <FormControl fullWidth>
+                      <InputLabel
+                        htmlFor="aset-select"
+                        id="asset-input-label"
                       >
-                        SUBMIT
-                      </Button>
-                    </Grid>
+                        Select Asset
+                      </InputLabel>
+                      <Controller
+                        control={control}
+                        name="asset"
+                        defaultValue=""
+                        as={(
+                          <Select
+                            id="asset-select"
+                          >
+                            {assetList.map((asset) => (
+                              <MenuItem key={asset.index} value={asset.index}>
+                                {asset.params.name}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                      )}
+                      />
+                      {!!errors.asset && <FormHelperText>Select an Asset</FormHelperText>}
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <FormControl fullWidth>
+                      <InputLabel htmlFor="transaction-type-select" id="transaction-type-select">
+                        Select Transaction Type
+                      </InputLabel>
+                      <Controller
+                        control={control}
+                        name="transactionType"
+                        defaultValue="all"
+                        as={(
+                          <Select id="transaction-type-select">
+                            {transactionTypes.map((type) => (
+                              <MenuItem key={type.value} value={type.value}>
+                                {type.text}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                      )}
+                      />
+                    </FormControl>
                   </Grid>
                 </Grid>
+                <Grid container spacing={4}>
+                  <Grid item xs={12}>
+                    <TextField
+                      label="Address"
+                      type="text"
+                      placeholder="Address"
+                      name="address"
+                      fullWidth
+                      disabled={isSubmitting}
+                      inputRef={register}
+                      error={!!errors.address}
+                      helperText={errors.address ? errors.address.message : ''}
+                    />
+                  </Grid>
+                </Grid>
+                <Grid container spacing={4}>
+                  <Grid item xs={6}>
+                    <TextField
+                      label="Min Balance"
+                      type="number"
+                      placeholder="Min Balance"
+                      name="minBalance"
+                      fullWidth
+                      disabled={isSubmitting}
+                      inputRef={register}
+                      error={!!errors.minBalance}
+                      helperText={errors.minBalance ? errors.minBalance.message : ''}
+                    />
+                  </Grid>
+                  <Grid item xs={6}>
+                    <TextField
+                      label="Max Balance"
+                      type="number"
+                      placeholder="Max Balance"
+                      name="maxBalance"
+                      fullWidth
+                      disabled={isSubmitting}
+                      inputRef={register}
+                      error={!!errors.maxBalance}
+                      helperText={errors.maxBalance ? errors.maxBalance.message : ''}
+                    />
+                  </Grid>
+                </Grid>
+                <Box p={2}>
+
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleSubmit(onSubmit)}
+                    fullWidth
+                    disabled={isSubmitting}
+                  >
+                    SUBMIT
+                  </Button>
+
+                </Box>
+
               </MuiPickersUtilsProvider>
             </form>
-          </div>
+          </Grid>
         )}
       {(response.transactions && <ASATransactionsTable transactions={response.transactions} />)}
-    </Container>
+    </div>
   );
 }
