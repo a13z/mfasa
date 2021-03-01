@@ -168,8 +168,8 @@ const ASATransactionsTable = ({ transactions }) => {
       initialState: {
         sortBy: [
           {
-            id: 'Age',
-            desc: false,
+            id: 'confirmed-round',
+            desc: true,
           },
         ],
       },

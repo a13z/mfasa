@@ -14,7 +14,7 @@ import TableRow from '@material-ui/core/TableRow';
 
 import { CircularProgress, Grid, Container } from '@material-ui/core';
 
-import { useTable } from 'react-table';
+import { useTable, useSortBy } from 'react-table';
 // import './react-table.css';
 
 import AlgoSdk from '../../services/AlgoSdk';
@@ -123,12 +123,12 @@ const ASATransactions = ({ asaList }) => {
       },
       {
         Header: 'Round',
-        accessor: 'confirmed-round', // accessor is the "key" in the data
+        accessor: 'confirmed-round',
+        sortDescFirst: true,
       },
       {
         Header: 'Age',
         accessor: 'round-time',
-        sortDescFirst: true,
         Cell: (cell) => {
           const fromRoundTimeToDate = fromUnixTime(cell.row.original['round-time']);
           return (
@@ -161,7 +161,21 @@ const ASATransactions = ({ asaList }) => {
     previousPage,
     setPageSize,
     pageSize,
-  } = useTable({ columns, data });
+  } = useTable(
+    {
+      columns,
+      data,
+      initialState: {
+        sortBy: [
+          {
+            id: 'confirmed-round',
+            desc: true,
+          },
+        ],
+      },
+    },
+    useSortBy,
+  );
 
   const classes = useStyles();
 
@@ -176,9 +190,16 @@ const ASATransactions = ({ asaList }) => {
                   <TableRow {...headerGroup.getHeaderGroupProps()}>
                     {headerGroup.headers.map((column) => (
                       <TableCell
-                        {...column.getHeaderProps()}
+                        {...column.getHeaderProps(column.getSortByToggleProps())}
                       >
                         {column.render('Header')}
+                        <span>
+                          {column.isSorted
+                            ? column.isSortedDesc
+                              ? ' 🔽'
+                              : ' 🔼'
+                            : ''}
+                        </span>
                       </TableCell>
                     ))}
                   </TableRow>
