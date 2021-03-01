@@ -54,9 +54,11 @@ const ASAManager = ({ assetId }) => {
   return (
     <Layout>
       <title>ASA Manager</title>
-      {loading ? <CircularProgress />
-        : <ASAList data={asaSummary} />}
-      <TxForm assetId={parseInt(assetId)} />
+      <Container>
+        {loading ? <CircularProgress />
+          : <ASAList data={asaSummary} />}
+        <TxForm assetId={parseInt(assetId)} />
+      </Container>
     </Layout>
 
   );
