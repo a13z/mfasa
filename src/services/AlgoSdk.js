@@ -212,7 +212,7 @@ class AlgoSdk {
     }
   }
 
-  async createAlgoSignerTransaction(type, from, to, amount, note, assetIndex) {
+  async createAlgoSignerTransaction(type, from, to, amount, note, assetIndex, revokeAddress) {
     const params = await this.getSuggestedTxParams();
 
     const assetRevocationTarget = undefined;
@@ -262,7 +262,7 @@ class AlgoSdk {
         transaction.to = to;
         transaction.amount = amount;
         transaction.assetIndex = assetIndex;
-        transaction.assetRevocationTarget = to;
+        transaction.assetRevocationTarget = revokeAddress;
         break;
       default:
         console.log('createAlgoSignerTransaction function: missing transaction type');
