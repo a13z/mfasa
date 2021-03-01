@@ -1,18 +1,64 @@
 import React, { useState, useContext, useEffect } from 'react';
+import { makeStyles, createStyles } from '@material-ui/core/styles';
+
+import fromUnixTime from 'date-fns/fromUnixTime';
+import { formatDistance, subDays } from 'date-fns';
 
 import CssBaseline from '@material-ui/core/CssBaseline';
+import TableContainer from '@material-ui/core/TableContainer';
 import MaUTable from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 
-import { CircularProgress } from '@material-ui/core';
+import { CircularProgress, Grid } from '@material-ui/core';
 
-import { useTable } from 'react-table';
+import { useTable, useSortBy } from 'react-table';
 import './react-table.css';
 
 import AlgoSdk from '../../services/AlgoSdk';
+
+const useStyles = makeStyles((theme) => createStyles({
+  root: {
+    flexGrow: 1,
+  },
+  paper: {
+    padding: theme.spacing(2),
+    textAlign: 'center',
+    color: theme.palette.text.secondary,
+  },
+  container: {
+    display: 'flex',
+    flexWrap: 'wrap',
+  },
+  textContainer: {
+    display: 'block',
+    maxWidth: '200px',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  textField: {
+    marginLeft: theme.spacing(1),
+    marginRight: theme.spacing(1),
+  },
+  dense: {
+    marginTop: theme.spacing(2),
+  },
+  margin: {
+    margin: theme.spacing(1),
+  },
+  menu: {
+    width: 200,
+  },
+  button: {
+    margin: theme.spacing(1),
+  },
+  extendedIcon: {
+    marginRight: theme.spacing(1),
+  },
+}));
 
 const ASATransactionsTable = ({ transactions }) => {
   console.log('ASATransactionsTable: transactions', transactions);
@@ -80,8 +126,18 @@ const ASATransactionsTable = ({ transactions }) => {
         accessor: 'confirmed-round', // accessor is the "key" in the data
       },
       {
-        Header: 'Round time',
+        Header: 'Age',
         accessor: 'round-time',
+        sortDescFirst: true,
+        Cell: (cell) => {
+          const fromRoundTimeToDate = fromUnixTime(cell.row.original['round-time']);
+          return (
+            <span>
+              {' '}
+              {formatDistance(fromRoundTimeToDate, new Date(), { addSuffix: true })}
+            </span>
+          );
+        },
       },
     ],
     [],
@@ -105,45 +161,75 @@ const ASATransactionsTable = ({ transactions }) => {
     previousPage,
     setPageSize,
     pageSize,
-  } = useTable({ columns, data });
+  } = useTable(
+    {
+      columns,
+      data,
+      initialState: {
+        sortBy: [
+          {
+            id: 'Age',
+            desc: false,
+          },
+        ],
+      },
+    },
+    useSortBy,
+  );
+  const classes = useStyles();
 
   return (
     <>
       {loading ? <CircularProgress />
         : (
           <>
-            <h2>Transacions results:</h2>
-            <MaUTable {...getTableProps()}>
-              <TableHead>
-                {headerGroups.map((headerGroup) => (
-                  <TableRow {...headerGroup.getHeaderGroupProps()}>
-                    {headerGroup.headers.map((column) => (
-                      <TableCell
-                        {...column.getHeaderProps()}
-                      >
-                        {column.render('Header')}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))}
-              </TableHead>
-              <TableBody {...getTableBodyProps()}>
-                {rows.map((row) => {
-                  prepareRow(row);
-                  return (
-                    <TableRow {...row.getRowProps()}>
-                      {row.cells.map((cell) => (
+            <Grid container align="center" justify="center" alignItems="center">
+              <Grid item>
+                <h2>Results</h2>
+              </Grid>
+            </Grid>
+            <TableContainer className={classes.container}>
+              <MaUTable style={{ width: 'auto', tableLayout: 'auto' }} className={classes.table} {...getTableProps()}>
+                <TableHead>
+                  {headerGroups.map((headerGroup) => (
+                    <TableRow {...headerGroup.getHeaderGroupProps()}>
+                      {headerGroup.headers.map((column) => (
                         <TableCell
-                          {...cell.getCellProps()}
+                          {...column.getHeaderProps(column.getSortByToggleProps())}
                         >
-                          {cell.render('Cell')}
+                          {column.render('Header')}
+                          <span>
+                            {column.isSorted
+                              ? column.isSortedDesc
+                                ? ' 🔽'
+                                : ' 🔼'
+                              : ''}
+                          </span>
                         </TableCell>
                       ))}
                     </TableRow>
-                  );
-                })}
-              </TableBody>
-            </MaUTable>
+                  ))}
+                </TableHead>
+                <TableBody {...getTableBodyProps()}>
+                  {rows.map((row) => {
+                    prepareRow(row);
+                    return (
+                      <TableRow {...row.getRowProps()}>
+                        {row.cells.map((cell) => (
+                          <TableCell
+                            {...cell.getCellProps()}
+                          >
+                            <div className={classes.textContainer}>
+                              {cell.render('Cell')}
+                            </div>
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </MaUTable>
+            </TableContainer>
           </>
         )}
     </>
