@@ -42,6 +42,10 @@ const useStyles = makeStyles((theme) => createStyles({
   container: {
     display: 'flex',
     flexWrap: 'wrap',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: '100%',
+    width: '100%',
   },
   textField: {
     marginLeft: theme.spacing(1),
@@ -73,10 +77,7 @@ const useStyles = makeStyles((theme) => createStyles({
 
 const validationSchema = yup.object().shape({
   amount: yup
-    .number()
-    .max(10000000000000000000)
-    .typeError('Amount must be a number')
-    .required('Amount field is Required'),
+    .number(),
   address: yup
     .string()
     .required('Manager Address is required'),
@@ -114,10 +115,12 @@ const TxForm = ({ assetId }) => {
     setError,
     control,
     reset,
+    watch,
     formState: { isSubmitting },
   } = useForm({
     resolver: yupResolver(validationSchema),
   });
+  // const watchTransactionType = watch(['transactionTypeS'], 'send'); // you can also target specific fields by their names
 
   const createAlgoSignerTransaction = async (values) => {
     const { AlgoSigner } = window;
@@ -128,8 +131,9 @@ const TxForm = ({ assetId }) => {
       ctx.currentAddress,
       values.address,
       values.amount,
-      'MFASA',
+      values.note,
       assetId,
+      values.revokeAddress,
     );
     console.log(transaction);
     AlgoSigner.sign(transaction)
@@ -183,6 +187,7 @@ const TxForm = ({ assetId }) => {
   };
 
   const handleTransactionTypeChange = (event) => {
+    console.log(event);
     setTransactionType(event.target.value);
   };
 
@@ -223,13 +228,69 @@ const TxForm = ({ assetId }) => {
     </div>
   );
 
+  const amountSubForm = (
+    <Grid container align="center" justify="center" alignItems="center">
+      <Grid item xs={6}>
+        <TextField
+          label="Amount"
+          type="number"
+          placeholder="Amount"
+          name="amount"
+          fullWidth
+          disabled={isSubmitting}
+          inputRef={register}
+          error={!!errors.amount}
+          helperText={errors.amount ? errors.amount.message : ''}
+        />
+      </Grid>
+    </Grid>
+  );
+  const noteSubForm = (
+    <Grid container align="center" justify="center" alignItems="center">
+      <Grid item xs={6}>
+        <TextField
+          label="Note"
+          type="text"
+          placeholder="Note"
+          name="note"
+          fullWidth
+          disabled={isSubmitting}
+          inputRef={register}
+        />
+      </Grid>
+    </Grid>
+  );
+  const revokeAddressSubForm = (
+    <Grid container align="center" justify="center" alignItems="center">
+      <Grid item xs={6}>
+        <TextField
+          label="Address to revoke assets"
+          type="text"
+          placeholder="Revoke Address"
+          name="revokeAddress"
+          fullWidth
+          disabled={isSubmitting}
+          inputRef={register}
+        />
+      </Grid>
+    </Grid>
+  );
   const showForm = (
-    <Container className={classes.container}>
+    <div className={classes.container}>
       { loading ? <LinearProgress />
         : (
-          <div className={classes.root}>
-            <form>
-              <Grid container>
+          <Grid
+            container
+            spacing={0}
+            align="center"
+            justify="center"
+            alignItems="center"
+          >
+            <Grid item align="center" justify="center" alignItems="center">
+              <h2>Create Transaction</h2>
+            </Grid>
+            <form className={classes.container}>
+              <Grid container align="center" justify="center" alignItems="center">
                 <Grid item xs={6}>
                   <FormControl fullWidth>
                     <InputLabel htmlFor="transaction-type-select" id="transaction-type-select">
@@ -239,8 +300,18 @@ const TxForm = ({ assetId }) => {
                       control={control}
                       name="transactionType"
                       defaultValue=""
-                      as={(
-                        <Select id="transaction-type-select">
+                      render={({
+                        onChange, value, onBlur, name,
+                      }) => (
+                        <Select
+                          id="transaction-type-select"
+                          onChange={(e) => {
+                            onChange(e);
+                            handleTransactionTypeChange(e);
+                          }}
+                          value={value || ''}
+                          name={name}
+                        >
                           {transactionTypes.map((type) => (
                             <MenuItem key={type.value} value={type.value}>
                               {type.text}
@@ -252,10 +323,10 @@ const TxForm = ({ assetId }) => {
                   </FormControl>
                 </Grid>
               </Grid>
-              <Grid container spacing={4}>
+              <Grid container align="center" justify="center" alignItems="center">
                 <Grid item xs={6}>
                   <TextField
-                    label="Address"
+                    label="To Address"
                     type="text"
                     placeholder="Address"
                     name="address"
@@ -265,24 +336,14 @@ const TxForm = ({ assetId }) => {
                   />
                 </Grid>
               </Grid>
-              <Grid container spacing={4}>
-                <Grid item xs={6}>
-                  <TextField
-                    label="Amount"
-                    type="number"
-                    placeholder="Amount"
-                    name="amount"
-                    fullWidth
-                    disabled={isSubmitting}
-                    inputRef={register}
-                    error={!!errors.amount}
-                    helperText={errors.amount ? errors.amount.message : ''}
-                  />
-                </Grid>
-              </Grid>
 
-              <Grid container spacing={4}>
-                <Grid item>
+              {(transactionType === 'send' || transactionType === 'revoke') && amountSubForm}
+              {(transactionType === 'send') && noteSubForm}
+              {(transactionType === 'revoke') && revokeAddressSubForm}
+
+              <Grid container align="center" justify="center" alignItems="center">
+                <Grid item xs={4} />
+                <Grid item xs={2}>
                   <Button
                     variant="contained"
                     color="primary"
@@ -295,9 +356,9 @@ const TxForm = ({ assetId }) => {
                 </Grid>
               </Grid>
             </form>
-          </div>
+          </Grid>
         )}
-    </Container>
+    </div>
   );
 
   return (
