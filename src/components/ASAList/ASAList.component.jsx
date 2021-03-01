@@ -1,6 +1,11 @@
 import React from 'react';
 import { Link } from 'gatsby';
-
+import TableContainer from '@material-ui/core/TableContainer';
+import MaUTable from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
 import { useTable } from 'react-table';
 
 import { CircularProgress, Grid } from '@material-ui/core';
@@ -68,37 +73,37 @@ const ASAList = ({ data, loading }) => {
             justify="center"
             alignItems="center"
           >
-            <table {...getTableProps()}>
-              <thead>
+            <MaUTable {...getTableProps()}>
+              <TableHead>
                 {headerGroups.map((headerGroup) => (
-                  <tr {...headerGroup.getHeaderGroupProps()}>
+                  <TableRow {...headerGroup.getHeaderGroupProps()}>
                     {headerGroup.headers.map((column) => (
-                      <th
+                      <TableCell
                         {...column.getHeaderProps()}
                       >
                         {column.render('Header')}
-                      </th>
+                      </TableCell>
                     ))}
-                  </tr>
+                  </TableRow>
                 ))}
-              </thead>
-              <tbody {...getTableBodyProps()}>
+              </TableHead>
+              <TableBody {...getTableBodyProps()}>
                 {rows.map((row) => {
                   prepareRow(row);
                   return (
-                    <tr {...row.getRowProps()}>
+                    <TableRow {...row.getRowProps()}>
                       {row.cells.map((cell) => (
-                        <td
+                        <TableCell
                           {...cell.getCellProps()}
                         >
                           {cell.render('Cell')}
-                        </td>
+                        </TableCell>
                       ))}
-                    </tr>
+                    </TableRow>
                   );
                 })}
-              </tbody>
-            </table>
+              </TableBody>
+            </MaUTable>
           </Grid>
         )}
     </>
