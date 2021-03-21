@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'gatsby';
+import Button from '@material-ui/core/Button';
 import TableContainer from '@material-ui/core/TableContainer';
 import MaUTable from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -27,13 +28,14 @@ const ASAList = ({ data, loading }) => {
         accessor: 'params.total',
       },
       {
-        accessor: 'manage',
-        Cell: ({ cell: { value }, row: { original } }) => <Link to={`asamanager/${original.index}`}>manage</Link>,
+        Header: 'Decimals',
+        accessor: 'params.decimals',
       },
-      // {
-      //   Header: 'Decimals',
-      //   accessor: 'params.decimals',
-      // },
+      {
+        accessor: 'manage',
+        Cell: ({ cell: { value }, row: { original } }) => <Button color="primary" variant="outlined" component={Link} to={`asamanager/${original.index}`}>manage</Button>,
+      },
+
       // {
       //   Header: 'Whitelisted addresses',
       //   accessor: 'whitelistedAddresses',
