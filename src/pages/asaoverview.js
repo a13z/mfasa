@@ -55,29 +55,14 @@ const ASAOverview = () => {
   useEffect(() => {
     setLoading(true);
     if (ctx.currentAddress) {
-      axios
-        .get(
-          `https://api.testnet.algoexplorer.io/idx2/v2/accounts/${ctx.currentAddress}`,
-        )
-        .then((res) => {
-          console.log(res.data.account);
-          setAccountDetails(res.data.account);
+      AlgoSdk.indexer.lookupAccountByID(ctx.currentAddress).do()
+        .then((response) => {
+          console.log(response);
+          setAccountDetails(response.account);
           setLoading(false);
-        // res.data['created-assets'].map((item) => {
-        //   console.log(item.index);
-        //   console.log(item.params.name, item.params.total);
-        //   axios
-        //     .get(
-        //       `https://api.testnet.algoexplorer.io/idx2/v2/assets/13672793/balances`
-        //     )
-        //     .then((res) => {
-        //       console.log(res);
-        //       const newBalances = res.data.balances.map((obj) => obj.address);
-        //       console.log(newBalances);
-        //       setAccountDetails({ balances: newBalances });
         })
-        .catch((e) => {
-          console.error(e);
+        .catch((error) => {
+          console.error(error);
         });
     }
   }, [ctx]);
