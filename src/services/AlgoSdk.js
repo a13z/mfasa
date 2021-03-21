@@ -13,18 +13,22 @@ class AlgoSdk {
     {
       name: 'testnet',
       label: 'TESTNET',
-      algodServer: `${process.env.GATSBY_ALGOD_TESTNET_URL}`,
-      algodPort: `${process.env.GATSBY_ALGOD_TESTNET_PORT}`,
-      algodToken: `${process.env.GATSBY_ALGOD_TESTNET_TOKEN}`,
-      indexerServer: `${process.env.GATSBY_INDEXER_TESTNET_URL}`,
-      indexerPort: `${process.env.GATSBY_INDEXER_TESTNET_PORT}`,
-      indexerToken: `${process.env.GATSBY_INDEXER_TESTNET_TOKEN}`,
+      algodServer: `${process.env.GATSBY_TESTNET_ALGOD_URL}`,
+      algodPort: `${process.env.GATSBY_TESTNET_ALGOD_PORT}`,
+      algodToken: `${process.env.GATSBY_TESTNET_ALGOD_TOKEN}`,
+      indexerServer: `${process.env.GATSBY_TESTNET_INDEXER_URL}`,
+      indexerPort: `${process.env.GATSBY_TESTNET_INDEXER_PORT}`,
+      indexerToken: `${process.env.GATSBY_TESTNET_INDEXER_TOKEN}`,
     },
     {
       name: 'mainnet',
-      server: 'https://mainnet-algorand.api.purestake.io/ps1',
       label: 'MAINNET',
-      indexer: 'https://api.algoexplorer.io/idx2/',
+      algodServer: `${process.env.GATSBY_MAINNET_ALGOD_URL}`,
+      algodPort: `${process.env.GATSBY_MAINNET_ALGOD_PORT}`,
+      algodToken: `${process.env.GATSBY_MAINNET_ALGOD_TOKEN}`,
+      indexerServer: `${process.env.GATSBY_MAINNET_INDEXER_URL}`,
+      indexerPort: `${process.env.GATSBY_MAINNET_INDEXER_PORT}`,
+      indexerToken: `${process.env.GATSBY_MAINNET_INDEXER_TOKEN}`,
     },
   ];
 
@@ -109,7 +113,7 @@ class AlgoSdk {
 
   async getAssetInformation(assetID) {
     console.log('getAssetInformation');
-    return this.getClient().assetInformation(assetID);
+    return await this.getIndexer().lookupAssetByID(assetID).do();
   }
 
   async getSuggestedTxParams() {
