@@ -7,10 +7,10 @@ import axios from 'axios';
 import { Container, Grid } from '@material-ui/core';
 import Layout from '../components/layout';
 import ASAList from '../components/ASAList/ASAList.component';
-import ASATransactions from '../components/ASATransactions/ASATransactions.component';
+import ASATransactionsTable from '../components/ASATransactionsTable/ASATransactionsTable.component';
 import AlgoSignerContext from '../contexts/algosigner.context';
 
-import AlgoSdk from '../services/AlgoSdk';
+import AlgoClient from '../services/AlgoClient';
 
 const useStyles = makeStyles((theme) => createStyles({
   root: {
@@ -45,20 +45,53 @@ const useStyles = makeStyles((theme) => createStyles({
     marginRight: theme.spacing(1),
   },
 }));
+const createdAssets = {};
 
 const ASAOverview = () => {
   const ctx = useContext(AlgoSignerContext);
   const [accountDetails, setAccountDetails] = useState({});
+  const [assets, setAssets] = useState({});
+  const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const classes = useStyles();
 
   useEffect(() => {
     setLoading(true);
     if (ctx.currentAddress) {
-      AlgoSdk.indexer.lookupAccountByID(ctx.currentAddress).do()
+      console.log('ctx.ledger ');
+      console.log(ctx.ledger);
+      const algoClient = new AlgoClient(ctx.ledger);
+      algoClient.getIndexer().lookupAccountByID(ctx.currentAddress).do()
         .then((response) => {
           console.log(response);
           setAccountDetails(response.account);
+          const asaTransactions = [];
+
+          response.account['created-assets'].forEach((asset) => {
+            createdAssets[asset.index] = asset.params;
+            console.log(createdAssets[asset.index]);
+          });
+          console.log(JSON.stringify(createdAssets));
+          setAssets(createdAssets);
+
+          Promise.all(response.account['created-assets'].map((asa) => algoClient.indexer.lookupAssetTransactions(asa.index).do()))
+            .then((response) => {
+              console.log('Promise all fetching transactions for asaList');
+              console.log(response);
+              response.forEach((item) => {
+                asaTransactions.push(...item.transactions);
+              });
+              console.log('ASATransactions: useEffect asaTransactions array:');
+              console.log(asaTransactions);
+              setTransactions(asaTransactions);
+              setLoading(false);
+            })
+            .catch((e) => {
+              console.error(e);
+            })
+            .finally(() => {
+              setLoading(false);
+            });
           setLoading(false);
         })
         .catch((error) => {
@@ -84,7 +117,7 @@ const ASAOverview = () => {
                 <h2>Transactions</h2>
               </Grid>
             </Grid>
-            <ASATransactions asaList={accountDetails['created-assets']} loading={loading} />
+            <ASATransactionsTable transactions={transactions} assetsCreated={createdAssets} loading={loading} />
           </>
         ) : (
           <h1>Select an account or this account has not created any ASA</h1>

@@ -1,6 +1,6 @@
 import sdk from 'algosdk';
 
-class AlgoSdk {
+class AlgoClient {
   client;
 
   clientV2;
@@ -11,7 +11,7 @@ class AlgoSdk {
 
   networks = [
     {
-      name: 'testnet',
+      name: 'TestNet',
       label: 'TESTNET',
       algodServer: `${process.env.GATSBY_TESTNET_ALGOD_URL}`,
       algodPort: `${process.env.GATSBY_TESTNET_ALGOD_PORT}`,
@@ -21,7 +21,7 @@ class AlgoSdk {
       indexerToken: `${process.env.GATSBY_TESTNET_INDEXER_TOKEN}`,
     },
     {
-      name: 'mainnet',
+      name: 'MainNet',
       label: 'MAINNET',
       algodServer: `${process.env.GATSBY_MAINNET_ALGOD_URL}`,
       algodPort: `${process.env.GATSBY_MAINNET_ALGOD_PORT}`,
@@ -32,8 +32,9 @@ class AlgoSdk {
     },
   ];
 
-  constructor() {
-    this.selectNetwork('testnet');
+  constructor(ledger) {
+    console.log('ledger');
+    this.selectNetwork(ledger);
   }
 
   selectNetwork(name) {
@@ -46,28 +47,6 @@ class AlgoSdk {
         this.setIndexer(network);
       }
     });
-  }
-
-  async getAccountDetailsIndexer(address) {
-    console.log(`getAccountDetailsIndexer ${address}`);
-    const network = this.getCurrentNetwork();
-    let accountDetails;
-
-    axios
-      .get(`${network}/v2/accounts/${address}`)
-      .then((res) => {
-        accountDetails = res.data.account;
-        console.log(res.data.account);
-      })
-      .catch((e) => {
-        console.error(e);
-      });
-
-    return accountDetails;
-  }
-
-  getAssetUrl(id) {
-    return `${this.getExplorer()}/asset/${id}`;
   }
 
   getCurrentNetwork() {
@@ -536,4 +515,5 @@ class AlgoSdk {
   }
 }
 
-export default new AlgoSdk();
+// export default new AlgoSdk();
+export default AlgoClient;

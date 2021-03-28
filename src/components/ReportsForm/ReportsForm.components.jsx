@@ -32,7 +32,7 @@ import { makeStyles, createStyles } from '@material-ui/core/styles';
 import ASATransactionsTable from '../ASATransactionsTable/ASATransactionsTable.component';
 import AlgoSignerContext from '../../contexts/algosigner.context';
 
-import AlgoSdk from '../../services/AlgoSdk';
+import AlgoClient from '../../services/AlgoClient';
 
 const useStyles = makeStyles((theme) => createStyles({
   root: {
@@ -124,12 +124,7 @@ const transactionTypes = [
   { value: 'axfer', text: 'Asset Transfer' },
 ];
 
-const getAccountDetails = async (address) => {
-  const accountDetails = await AlgoSdk.getIndexer().lookupAccountByID(address).do();
-  console.log('Reports: getAccountDetails ');
-  console.log(accountDetails);
-  return accountDetails.account;
-};
+const createdAssets = {};
 
 export default function ReportsForm(props) {
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
@@ -137,6 +132,7 @@ export default function ReportsForm(props) {
   const classes = useStyles();
 
   const ctx = useContext(AlgoSignerContext);
+  const algoClient = new AlgoClient(ctx.ledger);
 
   const [accountDetails, setAccountDetails] = useState({});
   const [assetList, setAssetList] = useState([]);
@@ -153,6 +149,13 @@ export default function ReportsForm(props) {
 
   const handleToDateChange = (date) => {
     setSelectedToDate(date.toISOString().substr(0, 10));
+  };
+
+  const getAccountDetails = async (address) => {
+    const accountDetails = await algoClient.getIndexer().lookupAccountByID(address).do();
+    console.log('Reports: getAccountDetails ');
+    console.log(accountDetails);
+    return accountDetails.account;
   };
 
   const {
@@ -175,7 +178,7 @@ export default function ReportsForm(props) {
       transactionType = '';
     }
 
-    const transactionsResults = await AlgoSdk.indexer.lookupAssetTransactions(asset)
+    const transactionsResults = await algoClient.indexer.lookupAssetTransactions(asset)
       .address(address)
       .txType(transactionType)
       .beforeTime(toDate)
@@ -204,6 +207,10 @@ export default function ReportsForm(props) {
           console.log(response);
           setAccountDetails(response);
           setAssetList(response['created-assets']);
+          response['created-assets'].forEach((asset) => {
+            createdAssets[asset.index] = asset.params;
+          });
+          console.log(JSON.stringify(createdAssets));
         // fetchTransactions();
         })
         .catch((e) => {
@@ -390,7 +397,7 @@ export default function ReportsForm(props) {
             </form>
           </Grid>
         )}
-      {(response.transactions && <ASATransactionsTable transactions={response.transactions} />)}
+      {(response.transactions && <ASATransactionsTable transactions={response.transactions} assetsCreated={createdAssets} />)}
     </div>
   );
 }

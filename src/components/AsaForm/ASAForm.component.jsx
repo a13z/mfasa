@@ -21,7 +21,7 @@ import { useSnackbar } from 'notistack';
 
 import AlgoSignerContext from '../../contexts/algosigner.context';
 
-import AlgoSdk from '../../services/AlgoSdk';
+import AlgoClient from '../../services/AlgoClient';
 
 // import "./ASAForm.style.scss";
 const useStyles = makeStyles((theme) => createStyles({
@@ -84,6 +84,7 @@ const validationSchema = yup.object().shape({
 
 const ASAForm = ({ asaId }) => {
   const ctx = useContext(AlgoSignerContext);
+  const algoClient = new AlgoClient(ctx.ledger);
 
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
@@ -119,7 +120,7 @@ const ASAForm = ({ asaId }) => {
     console.log(values);
 
     // Create transaction
-    AlgoSdk.createAssetTxn(
+    algoClient.createAssetTxn(
       ctx.currentAddress,
       values.assetName,
       values.unitName,
@@ -141,11 +142,11 @@ const ASAForm = ({ asaId }) => {
           console.log(JSON.stringify(signedTxn, null, 2));
           console.log(signedTxn.txID, signedTxn.blob);
 
-          AlgoSdk.sendTransaction(signedTxn.blob)
+          algoClient.sendTransaction(signedTxn.blob)
             .then((txnSent) => {
               console.log('Txn signed sent');
               console.log(txnSent);
-              AlgoSdk.waitForConfirmation(txnSent.txId)
+              algoClient.waitForConfirmation(txnSent.txId)
                 .then((response) => {
                   setAsaTxn(
                     {

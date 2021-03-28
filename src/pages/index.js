@@ -6,7 +6,6 @@ import axios from 'axios';
 import { Container } from '@material-ui/core';
 import Layout from '../components/layout';
 import ASAList from '../components/ASAList/ASAList.component';
-import ASATransactions from '../components/ASATransactions/ASATransactions.component';
 import AlgoSignerContext from '../contexts/algosigner.context';
 
 import ASAOverview from './asaoverview';
@@ -14,7 +13,7 @@ import ASAManager from './asamanager';
 import ASAConfig from './asaconfig';
 import Reports from './reports';
 
-import AlgoSdk from '../services/AlgoSdk';
+import AlgoClient from '../services/AlgoClient';
 
 const IndexPage = (props) => {
   const ctx = useContext(AlgoSignerContext);
@@ -24,26 +23,12 @@ const IndexPage = (props) => {
   useEffect(() => {
     setLoading(true);
     if (ctx.currentAddress) {
-      axios
-        .get(
-          `https://api.testnet.algoexplorer.io/idx2/v2/accounts/${ctx.currentAddress}`,
-        )
-        .then((res) => {
-          console.log(res.data.account);
-          setAccountDetails(res.data.account);
+      const algoClient = new AlgoClient(ctx.ledger);
+      algoClient.getIndexer().lookupAccountByID(ctx.currentAddress).do()
+        .then((response) => {
+          console.log(response);
+          setAccountDetails(response.account);
           setLoading(false);
-        // res.data['created-assets'].map((item) => {
-        //   console.log(item.index);
-        //   console.log(item.params.name, item.params.total);
-        //   axios
-        //     .get(
-        //       `https://api.testnet.algoexplorer.io/idx2/v2/assets/13672793/balances`
-        //     )
-        //     .then((res) => {
-        //       console.log(res);
-        //       const newBalances = res.data.balances.map((obj) => obj.address);
-        //       console.log(newBalances);
-        //       setAccountDetails({ balances: newBalances });
         })
         .catch((e) => {
           console.error(e);
