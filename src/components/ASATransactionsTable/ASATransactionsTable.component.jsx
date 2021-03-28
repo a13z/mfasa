@@ -2,7 +2,7 @@ import React, { useState, useContext, useEffect } from 'react';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
 
 import fromUnixTime from 'date-fns/fromUnixTime';
-import { formatDistance, subDays } from 'date-fns';
+import { formatDistance, subDays, format } from 'date-fns';
 
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TableContainer from '@material-ui/core/TableContainer';
@@ -14,7 +14,7 @@ import TableRow from '@material-ui/core/TableRow';
 
 import { CircularProgress, Grid } from '@material-ui/core';
 
-import { useTable, useSortBy } from 'react-table';
+import { useTable, useSortBy, usePagination } from 'react-table';
 import './react-table.css';
 
 import AlgoSdk from '../../services/AlgoSdk';
@@ -60,34 +60,11 @@ const useStyles = makeStyles((theme) => createStyles({
   },
 }));
 
-const ASATransactionsTable = ({ transactions }) => {
+const ASATransactionsTable = ({ transactions, assetsCreated }) => {
   console.log('ASATransactionsTable: transactions', transactions);
+  console.log(JSON.stringify(assetsCreated));
 
-  // const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(false);
-
-  // useEffect(() => {
-  //   const asaTransactions = [];
-
-  //   Promise.all(asaList.map((asa) => AlgoSdk.indexer.lookupAssetTransactions(asa.index).do()))
-  //     .then((response) => {
-  //       console.log('Promise all fetching transactions for asaList');
-  //       console.log(response);
-  //       response.forEach((item) => {
-  //         asaTransactions.push(...item.transactions);
-  //       });
-  //       console.log('ASATransactions: useEffect asaTransactions array:');
-  //       console.log(asaTransactions);
-  //       setTransactions(asaTransactions);
-  //       setLoading(false);
-  //     })
-  //     .catch((e) => {
-  //       console.error(e);
-  //     })
-  //     .finally(() => {
-  //       setLoading(false);
-  //     });
-  // }, [asaList]);
 
   const columns = React.useMemo(
     () => [
@@ -116,29 +93,76 @@ const ASATransactionsTable = ({ transactions }) => {
       {
         Header: 'Amount',
         accessor: 'asset-transfer-transaction.amount',
+        Cell: (cell) => {
+          if (cell.row.original['asset-transfer-transaction'] !== undefined) {
+            const { decimals } = assetsCreated[cell.row.original['asset-transfer-transaction']['asset-id'].toString()];
+            return (
+              <span>
+                {(cell.row.original['asset-transfer-transaction'].amount / (10 ** decimals)).toFixed(decimals)}
+              </span>
+            );
+          }
+          return (
+            <span />
+          );
+        },
       },
       {
-        Header: 'Fee',
+        Header: 'Decimals',
+        accessor: 'decimals',
+        Cell: (cell) => {
+          if (cell.row.original['asset-transfer-transaction'] !== undefined) {
+            return (
+              <span>
+                {assetsCreated[cell.row.original['asset-transfer-transaction']['asset-id'].toString()].decimals}
+              </span>
+            );
+          }
+
+          return (
+            <span />
+          );
+        },
+      },
+      {
+        Header: 'Fee (Algos)',
         accessor: 'fee',
+        Cell: (cell) => (
+          <span>
+            {cell.row.original.fee / 1000000}
+          </span>
+        ),
       },
       {
         Header: 'Round',
-        accessor: 'confirmed-round', // accessor is the "key" in the data
+        accessor: 'confirmed-round',
+        sortDescFirst: true,
       },
       {
-        Header: 'Age',
+        Header: 'Date/Time (UTC)',
         accessor: 'round-time',
-        sortDescFirst: true,
         Cell: (cell) => {
           const fromRoundTimeToDate = fromUnixTime(cell.row.original['round-time']);
           return (
             <span>
-              {' '}
-              {formatDistance(fromRoundTimeToDate, new Date(), { addSuffix: true })}
+              {format(fromRoundTimeToDate, "dd-MM-yyyy' 'HH:mm:ss")}
             </span>
           );
         },
       },
+      // {
+      //   Header: 'Age',
+      //   accessor: 'round-time',
+      //   Cell: (cell) => {
+      //     const fromRoundTimeToDate = fromUnixTime(cell.row.original['round-time']);
+      //     return (
+      //       <span>
+      //         {' '}
+      //         {formatDistance(fromRoundTimeToDate, new Date(), { addSuffix: true })}
+      //       </span>
+      //     );
+      //   },
+      // },
     ],
     [],
   );
@@ -157,15 +181,19 @@ const ASATransactionsTable = ({ transactions }) => {
     prepareRow,
     canPreviousPage,
     canNextPage,
+    pageOptions,
+    pageCount,
+    gotoPage,
     nextPage,
     previousPage,
     setPageSize,
-    pageSize,
+    state: { pageIndex, pageSize },
   } = useTable(
     {
       columns,
       data,
       initialState: {
+        pageIndex: 0,
         sortBy: [
           {
             id: 'confirmed-round',
@@ -175,7 +203,11 @@ const ASATransactionsTable = ({ transactions }) => {
       },
     },
     useSortBy,
+    usePagination,
   );
+
+  // Render the UI for your table
+
   const classes = useStyles();
 
   return (
@@ -183,11 +215,6 @@ const ASATransactionsTable = ({ transactions }) => {
       {loading ? <CircularProgress />
         : (
           <>
-            <Grid container align="center" justify="center" alignItems="center">
-              <Grid item>
-                <h2>Results</h2>
-              </Grid>
-            </Grid>
             <TableContainer className={classes.container}>
               <MaUTable style={{ width: 'auto', tableLayout: 'auto' }} className={classes.table} {...getTableProps()}>
                 <TableHead>
@@ -211,7 +238,7 @@ const ASATransactionsTable = ({ transactions }) => {
                   ))}
                 </TableHead>
                 <TableBody {...getTableBodyProps()}>
-                  {rows.map((row) => {
+                  {page.map((row, i) => {
                     prepareRow(row);
                     return (
                       <TableRow {...row.getRowProps()}>
@@ -219,9 +246,11 @@ const ASATransactionsTable = ({ transactions }) => {
                           <TableCell
                             {...cell.getCellProps()}
                           >
+
                             <div className={classes.textContainer}>
                               {cell.render('Cell')}
                             </div>
+
                           </TableCell>
                         ))}
                       </TableRow>
@@ -230,6 +259,63 @@ const ASATransactionsTable = ({ transactions }) => {
                 </TableBody>
               </MaUTable>
             </TableContainer>
+            <div className="pagination">
+              <button onClick={() => gotoPage(0)} disabled={!canPreviousPage}>
+                {'<<'}
+              </button>
+              {' '}
+              <button onClick={() => previousPage()} disabled={!canPreviousPage}>
+                {'<'}
+              </button>
+              {' '}
+              <button onClick={() => nextPage()} disabled={!canNextPage}>
+                {'>'}
+              </button>
+              {' '}
+              <button onClick={() => gotoPage(pageCount - 1)} disabled={!canNextPage}>
+                {'>>'}
+              </button>
+              {' '}
+              <span>
+                Page
+                {' '}
+                <strong>
+                  {pageIndex + 1}
+                  {' '}
+                  of
+                  {pageOptions.length}
+                </strong>
+                {' '}
+              </span>
+              <span>
+                | Go to page:
+                {' '}
+                <input
+                  type="number"
+                  defaultValue={pageIndex + 1}
+                  onChange={(e) => {
+                    const page = e.target.value ? Number(e.target.value) - 1 : 0;
+                    gotoPage(page);
+                  }}
+                  style={{ width: '100px' }}
+                />
+              </span>
+              {' '}
+              <select
+                value={pageSize}
+                onChange={(e) => {
+                  setPageSize(Number(e.target.value));
+                }}
+              >
+                {[10, 20, 30, 40, 50].map((pageSize) => (
+                  <option key={pageSize} value={pageSize}>
+                    Show
+                    {' '}
+                    {pageSize}
+                  </option>
+                ))}
+              </select>
+            </div>
           </>
         )}
     </>
