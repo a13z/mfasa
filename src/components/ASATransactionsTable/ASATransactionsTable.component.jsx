@@ -17,8 +17,6 @@ import { CircularProgress, Grid } from '@material-ui/core';
 import { useTable, useSortBy, usePagination } from 'react-table';
 import './react-table.css';
 
-import AlgoSdk from '../../services/AlgoSdk';
-
 const useStyles = makeStyles((theme) => createStyles({
   root: {
     flexGrow: 1,
@@ -108,23 +106,6 @@ const ASATransactionsTable = ({ transactions, assetsCreated }) => {
         },
       },
       {
-        Header: 'Decimals',
-        accessor: 'decimals',
-        Cell: (cell) => {
-          if (cell.row.original['asset-transfer-transaction'] !== undefined) {
-            return (
-              <span>
-                {assetsCreated[cell.row.original['asset-transfer-transaction']['asset-id'].toString()].decimals}
-              </span>
-            );
-          }
-
-          return (
-            <span />
-          );
-        },
-      },
-      {
         Header: 'Fee (Algos)',
         accessor: 'fee',
         Cell: (cell) => (
@@ -150,19 +131,6 @@ const ASATransactionsTable = ({ transactions, assetsCreated }) => {
           );
         },
       },
-      // {
-      //   Header: 'Age',
-      //   accessor: 'round-time',
-      //   Cell: (cell) => {
-      //     const fromRoundTimeToDate = fromUnixTime(cell.row.original['round-time']);
-      //     return (
-      //       <span>
-      //         {' '}
-      //         {formatDistance(fromRoundTimeToDate, new Date(), { addSuffix: true })}
-      //       </span>
-      //     );
-      //   },
-      // },
     ],
     [],
   );
