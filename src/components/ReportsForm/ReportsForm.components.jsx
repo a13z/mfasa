@@ -210,11 +210,13 @@ export default function ReportsForm(props) {
           setLoading(false);
           console.log(response);
           setAccountDetails(response);
-          setAssetList(response['created-assets']);
-          response['created-assets'].forEach((asset) => {
-            createdAssets[asset.index] = asset.params;
-          });
-          console.log(JSON.stringify(createdAssets));
+          if (response['created-assets'] !== undefined) {
+            setAssetList(response['created-assets']);
+            response['created-assets'].forEach((asset) => {
+              createdAssets[asset.index] = asset.params;
+            });
+            console.log(JSON.stringify(createdAssets));
+          }
         // fetchTransactions();
         })
         .catch((e) => {
