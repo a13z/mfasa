@@ -256,9 +256,13 @@ const ASAForm = ({ asaId }) => {
         Round:
         {asaTxn.round}
       </p>
-      <button type="button" onClick={() => setSubmitted(false)}>
-        Create another asset?
-      </button>
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={() => setSubmitted(false)}
+      >
+        Create another asset
+      </Button>
     </div>
   );
 
@@ -449,7 +453,7 @@ const ASAForm = ({ asaId }) => {
   return (
     <div className="asa create-asa-page">
       <div className="form-side">
-        {submitted ? showAsaCreatedMessage : showForm}
+        { loading ? showLinearProgress : submitted ? showAsaCreatedMessage : showForm}
       </div>
     </div>
 
