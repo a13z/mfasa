@@ -84,7 +84,6 @@ const validationSchema = yup.object().shape({
 
 const ASAForm = ({ asaId }) => {
   const ctx = useContext(AlgoSignerContext);
-  const algoClient = new AlgoClient(ctx.ledger);
 
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
@@ -117,6 +116,8 @@ const ASAForm = ({ asaId }) => {
 
   const createASATx = (values, setLoading, setSubmitted) => {
     const { AlgoSigner } = window;
+    const algoClient = new AlgoClient(ctx.ledger);
+
     console.log(values);
 
     // Create transaction
