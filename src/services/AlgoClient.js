@@ -295,7 +295,7 @@ class AlgoClient {
       genesisID: params.genesisID,
       genesisHash: params.genesisHash,
       assetURL,
-      // assetMetadataHash,
+      assetMetadataHash,
       assetDefaultFrozen,
       assetManager,
       assetReserve,
