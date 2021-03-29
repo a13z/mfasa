@@ -16,11 +16,12 @@ const ASAManager = ({ assetId }) => {
   console.log(assetId);
 
   const ctx = useContext(AlgoSignerContext);
-  const algoClient = new AlgoClient(ctx.ledger);
   const [assetInformation, setAssetInformation] = useState();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const algoClient = new AlgoClient(ctx.ledger);
+
     algoClient.getAssetInformation(parseInt(assetId))
       .then((response) => {
         console.log(JSON.stringify(response));

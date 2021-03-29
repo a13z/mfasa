@@ -132,7 +132,6 @@ export default function ReportsForm(props) {
   const classes = useStyles();
 
   const ctx = useContext(AlgoSignerContext);
-  const algoClient = new AlgoClient(ctx.ledger);
 
   const [accountDetails, setAccountDetails] = useState({});
   const [assetList, setAssetList] = useState([]);
@@ -152,6 +151,8 @@ export default function ReportsForm(props) {
   };
 
   const getAccountDetails = async (address) => {
+    const algoClient = new AlgoClient(ctx.ledger);
+
     const accountDetails = await algoClient.getIndexer().lookupAccountByID(address).do();
     console.log('Reports: getAccountDetails ');
     console.log(accountDetails);
@@ -177,6 +178,7 @@ export default function ReportsForm(props) {
     if (transactionType === 'all') {
       transactionType = '';
     }
+    const algoClient = new AlgoClient(ctx.ledger);
 
     const transactionsResults = await algoClient.indexer.lookupAssetTransactions(asset)
       .address(address)
@@ -199,6 +201,8 @@ export default function ReportsForm(props) {
   console.log(errors);
 
   useEffect(() => {
+    const algoClient = new AlgoClient(ctx.ledger);
+
     setLoading(true);
     if (ctx.currentAddress) {
       getAccountDetails(ctx.currentAddress)

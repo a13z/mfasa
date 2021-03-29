@@ -93,7 +93,6 @@ const transactionTypes = [
 
 const TxForm = ({ assetId }) => {
   const ctx = useContext(AlgoSignerContext);
-  const algoClient = new AlgoClient(ctx.ledger);
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
   const classes = useStyles();
@@ -125,6 +124,8 @@ const TxForm = ({ assetId }) => {
 
   const createAlgoSignerTransaction = async (values) => {
     const { AlgoSigner } = window;
+    const algoClient = new AlgoClient(ctx.ledger);
+
     console.log(values);
 
     const transaction = await algoClient.createAlgoSignerTransaction(
