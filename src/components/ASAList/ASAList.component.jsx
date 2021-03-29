@@ -32,6 +32,10 @@ const ASAList = ({ data, loading }) => {
         accessor: 'params.decimals',
       },
       {
+        Header: 'Default frozen',
+        accessor: (d) => d.params['default-frozen'].toString(),
+      },
+      {
         accessor: 'manage',
         Cell: ({ cell: { value }, row: { original } }) => <Button color="primary" variant="outlined" component={Link} to={`asamanager/${original.index}`}>manage</Button>,
       },
