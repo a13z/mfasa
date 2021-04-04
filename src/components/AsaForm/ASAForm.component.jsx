@@ -21,7 +21,7 @@ import { useSnackbar } from 'notistack';
 
 import AlgoSignerContext from '../../contexts/algosigner.context';
 
-import AlgoSdk from '../../services/AlgoSdk';
+import AlgoClient from '../../services/AlgoClient';
 
 // import "./ASAForm.style.scss";
 const useStyles = makeStyles((theme) => createStyles({
@@ -116,10 +116,12 @@ const ASAForm = ({ asaId }) => {
 
   const createASATx = (values, setLoading, setSubmitted) => {
     const { AlgoSigner } = window;
+    const algoClient = new AlgoClient(ctx.ledger);
+
     console.log(values);
 
     // Create transaction
-    AlgoSdk.createAssetTxn(
+    algoClient.createAssetTxn(
       ctx.currentAddress,
       values.assetName,
       values.unitName,
@@ -141,11 +143,11 @@ const ASAForm = ({ asaId }) => {
           console.log(JSON.stringify(signedTxn, null, 2));
           console.log(signedTxn.txID, signedTxn.blob);
 
-          AlgoSdk.sendTransaction(signedTxn.blob)
+          algoClient.sendTransaction(signedTxn.blob)
             .then((txnSent) => {
               console.log('Txn signed sent');
               console.log(txnSent);
-              AlgoSdk.waitForConfirmation(txnSent.txId)
+              algoClient.waitForConfirmation(txnSent.txId)
                 .then((response) => {
                   setAsaTxn(
                     {
@@ -254,9 +256,13 @@ const ASAForm = ({ asaId }) => {
         Round:
         {asaTxn.round}
       </p>
-      <button type="button" onClick={() => setSubmitted(false)}>
-        Create another asset?
-      </button>
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={() => setSubmitted(false)}
+      >
+        Create another asset
+      </Button>
     </div>
   );
 
@@ -447,7 +453,7 @@ const ASAForm = ({ asaId }) => {
   return (
     <div className="asa create-asa-page">
       <div className="form-side">
-        {submitted ? showAsaCreatedMessage : showForm}
+        { loading ? showLinearProgress : submitted ? showAsaCreatedMessage : showForm}
       </div>
     </div>
 

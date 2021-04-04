@@ -13,6 +13,7 @@ import {
   FormControl,
   FormControlLabel,
   LinearProgress,
+  CircularProgress,
   MenuItem,
   Switch,
 } from '@material-ui/core';
@@ -26,7 +27,7 @@ import { useSnackbar } from 'notistack';
 
 import AlgoSignerContext from '../../contexts/algosigner.context';
 
-import AlgoSdk from '../../services/AlgoSdk';
+import AlgoClient from '../../services/AlgoClient';
 
 const useStyles = makeStyles((theme) => createStyles({
   root: {
@@ -92,7 +93,6 @@ const transactionTypes = [
 
 const TxForm = ({ assetId }) => {
   const ctx = useContext(AlgoSignerContext);
-
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
   const classes = useStyles();
@@ -124,9 +124,11 @@ const TxForm = ({ assetId }) => {
 
   const createAlgoSignerTransaction = async (values) => {
     const { AlgoSigner } = window;
+    const algoClient = new AlgoClient(ctx.ledger);
+
     console.log(values);
 
-    const transaction = await AlgoSdk.createAlgoSignerTransaction(
+    const transaction = await algoClient.createAlgoSignerTransaction(
       values.transactionType,
       ctx.currentAddress,
       values.address,
@@ -142,11 +144,11 @@ const TxForm = ({ assetId }) => {
         console.log(JSON.stringify(signedTxn, null, 2));
         console.log(signedTxn.txID, signedTxn.blob);
 
-        AlgoSdk.sendTransaction(signedTxn.blob)
+        algoClient.sendTransaction(signedTxn.blob)
           .then((txnSent) => {
             console.log('Transaction sent');
             console.log(txnSent);
-            AlgoSdk.waitForConfirmation(txnSent.txId)
+            algoClient.waitForConfirmation(txnSent.txId)
               .then((response) => {
                 setAsaTxn(
                   {
@@ -364,7 +366,10 @@ const TxForm = ({ assetId }) => {
   return (
     <div className="asa create-asa-page">
       <div className="form-side">
-        {submitted ? showAsaCreatedMessage : showForm}
+
+        {loading ? <CircularProgress /> : showForm}
+
+        {/* {submitted ? showAsaCreatedMessage : showForm} */}
       </div>
     </div>
   );

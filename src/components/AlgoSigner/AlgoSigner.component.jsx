@@ -60,7 +60,6 @@ const AlgoSigner = (props) => {
         .then((AlgoSignerWallet) => {
           console.log(JSON.stringify(AlgoSignerWallet));
           setWallet(AlgoSignerWallet);
-          console.log(JSON.stringify(wallet));
         })
         .catch((e) => {
           console.error(e);
