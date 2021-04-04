@@ -40,7 +40,7 @@ const IndexPage = (props) => {
       <Router>
         <ASAOverview path="/" />
         <ASAManager path="/asamanager/:assetId" />
-        <ASAConfig path="/asaconfig" />
+        <ASAConfig path="/asaconfig/:assetId" />
         <Reports path="/reports" />
       </Router>
     </Layout>

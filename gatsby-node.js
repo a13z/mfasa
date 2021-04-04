@@ -30,4 +30,16 @@ exports.onCreatePage = async ({ page, actions }) => {
       },
     );
   }
+
+  if (page.path.match(/^\/asaconfig/)) {
+    page.matchPath = '/asaconfig/*';
+
+    createPage(
+      {
+        path: '/asaconfig/',
+        matchPath: '/asaconfig/:assetId',
+        component: path.resolve('./src/pages/asaconfig.js'),
+      },
+    );
+  }
 };

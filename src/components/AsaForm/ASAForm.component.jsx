@@ -1,4 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
+import PropTypes from 'prop-types';
 
 import { makeStyles, createStyles } from '@material-ui/core/styles';
 
@@ -82,7 +83,7 @@ const validationSchema = yup.object().shape({
     .required('Manager Address is required'),
 });
 
-const ASAForm = ({ asaId }) => {
+const ASAForm = ({ assetId }) => {
   const ctx = useContext(AlgoSignerContext);
 
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
@@ -108,11 +109,31 @@ const ASAForm = ({ asaId }) => {
     handleSubmit,
     register,
     setError,
+    setValue,
+    getValue,
     reset,
     formState: { isSubmitting },
   } = useForm({
     resolver: yupResolver(validationSchema),
   });
+
+  useEffect(() => {
+    console.log('ASAForm assetId:');
+    console.log(assetId);
+    const algoClient = new AlgoClient(ctx.ledger);
+
+    algoClient.getAssetInformation(parseInt(assetId))
+      .then((response) => {
+        console.log(JSON.stringify(response));
+        setValue(assetName, response.asset.params.name);
+        setValue(managerAddress, response.asset.params.manager);
+
+        setLoading(false);
+      })
+      .catch((e) => {
+        console.error(e);
+      });
+  }, []);
 
   const createASATx = (values, setLoading, setSubmitted) => {
     const { AlgoSigner } = window;
@@ -461,3 +482,7 @@ const ASAForm = ({ asaId }) => {
 };
 
 export default ASAForm;
+
+ASAForm.propTypes = {
+  assetId: PropTypes.number,
+};
