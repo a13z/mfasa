@@ -118,21 +118,23 @@ const ASAForm = ({ assetId }) => {
   });
 
   useEffect(() => {
-    console.log('ASAForm assetId:');
-    console.log(assetId);
-    const algoClient = new AlgoClient(ctx.ledger);
+    if (assetId != '') {
+      console.log('ASAForm assetId:');
+      console.log(assetId);
+      const algoClient = new AlgoClient(ctx.ledger);
 
-    algoClient.getAssetInformation(parseInt(assetId))
-      .then((response) => {
-        console.log(JSON.stringify(response));
-        setValue(assetName, response.asset.params.name);
-        setValue(managerAddress, response.asset.params.manager);
+      algoClient.getAssetInformation(parseInt(assetId))
+        .then((response) => {
+          console.log(JSON.stringify(response));
+          setValue('assetName', response.asset.params.name);
+          // reset([{ assetName: response.asset.params.name }, { managerAddress: response.asset.params.manager }]);
 
-        setLoading(false);
-      })
-      .catch((e) => {
-        console.error(e);
-      });
+          setLoading(false);
+        })
+        .catch((e) => {
+          console.error(e);
+        });
+    }
   }, []);
 
   const createASATx = (values, setLoading, setSubmitted) => {
@@ -303,6 +305,7 @@ const ASAForm = ({ assetId }) => {
                     fullWidth
                     required
                     disabled={isSubmitting}
+                    defaultValue=""
                     inputRef={register}
                     error={!!errors.assetName}
                     helperText={errors.assetName ? errors.assetName.message : ''}
