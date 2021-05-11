@@ -4,14 +4,14 @@ import { Link } from 'gatsby';
 import axios from 'axios';
 
 import { Container } from '@material-ui/core';
-import Layout from '../components/layout';
-import ASAList from '../components/ASAList/ASAList.component';
+import Layout from '../components/Layout';
 import AlgoSignerContext from '../contexts/algosigner.context';
 
 // import ASAOverview from './app/asaoverview';
 // import ASAManager from './asamanager';
 // import ASAConfig from './app/asaconfig';
 // import Reports from './reports';
+// import ASAList from '../components/ASAList/ASAList.component';
 
 import Login from '../components/Login';
 import PrivateRoute from '../components/PrivateRoute';

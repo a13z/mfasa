@@ -5,7 +5,6 @@ import { makeStyles, createStyles } from '@material-ui/core/styles';
 import axios from 'axios';
 
 import { Container, Grid } from '@material-ui/core';
-import Layout from './Layout';
 import ASAList from './ASAList/ASAList.component';
 import ASATransactionsTable from './ASATransactionsTable/ASATransactionsTable.component';
 import AlgoSignerContext from '../contexts/algosigner.context';
