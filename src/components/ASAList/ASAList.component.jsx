@@ -37,7 +37,7 @@ const ASAList = ({ data, loading }) => {
       },
       {
         accessor: 'manage',
-        Cell: ({ cell: { value }, row: { original } }) => <Button color="primary" variant="outlined" component={Link} to={`asamanager/${original.index}`}>manage</Button>,
+        Cell: ({ cell: { value }, row: { original } }) => <Button color="primary" variant="outlined" component={Link} to={`/app/asamanager/${original.index}`}>manage</Button>,
       },
 
       // {
