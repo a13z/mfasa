@@ -1,9 +1,9 @@
 import React from 'react';
 
 import {
-  AppBar, Toolbar, List, ListItem, ListItemText, IconButton, Container,
+  AppBar, Toolbar, List, ListItem, ListItemText, IconButton, Container, Button,
 } from '@material-ui/core';
-
+import MenuIcon from '@material-ui/icons/Menu';
 import Typography from '@material-ui/core/Typography';
 import { fade, makeStyles } from '@material-ui/core/styles';
 import SearchIcon from '@material-ui/icons/Search';
@@ -12,6 +12,8 @@ import { Home } from '@material-ui/icons';
 
 import { Link } from 'gatsby';
 import PropTypes from 'prop-types';
+
+import MenuAppBar from './MenuAppBar/MenuAppBar.component';
 
 const useStyles = makeStyles((theme) => ({
   navDisplayFlex: {
@@ -50,35 +52,7 @@ const Header = ({ siteTitle }) => {
 
   return (
     <header className={classes.root}>
-      <AppBar position="static">
-        <Toolbar>
-          <Container className={classes.root}>
-            <List component="nav" aria-labelledby="main navigation" className={classes.navDisplayFlex}>
-              <ListItem button>
-                <ListLink className={classes.linkText} to="/">
-                  <Typography className={classes.title} variant="h6" noWrap>
-                    {siteTitle}
-                  </Typography>
-                </ListLink>
-              </ListItem>
-              <ListItem button>
-                <ListLink className={classes.linkText} to="/asaconfig/">
-                  <Typography className={classes.title} variant="h6" noWrap>
-                    ASA config
-                  </Typography>
-                </ListLink>
-              </ListItem>
-              <ListItem button>
-                <ListLink className={classes.linkText} to="/reports/">
-                  <Typography className={classes.title} variant="h6" noWrap>
-                    Reports
-                  </Typography>
-                </ListLink>
-              </ListItem>
-            </List>
-          </Container>
-        </Toolbar>
-      </AppBar>
+      <MenuAppBar siteTitle={siteTitle} />
     </header>
   );
 };
