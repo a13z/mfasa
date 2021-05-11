@@ -67,6 +67,7 @@ class AlgoClient {
 
   setIndexer(network) {
     this.indexer = new sdk.Indexer(network.indexerToken, network.indexerServer, network.indexerPort);
+    console.log(this.indexer);
   }
 
   getClient() {
