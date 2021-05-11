@@ -4,9 +4,9 @@ import PropTypes from 'prop-types';
 import { Container, CircularProgress, Grid } from '@material-ui/core';
 import Select from '@material-ui/core/Select';
 
-import Layout from '../components/layout';
-import ASAList from '../components/ASAList/ASAList.component';
-import TxForm from '../components/TxForm/TxForm.component';
+import View from './View';
+import ASAList from './ASAList/ASAList.component';
+import TxForm from './TxForm/TxForm.component';
 import AlgoSignerContext from '../contexts/algosigner.context';
 
 import AlgoClient from '../services/AlgoClient';
@@ -40,8 +40,7 @@ const ASAManager = ({ assetId }) => {
   // const canonicalUrl = props.data.site.siteMetadata.siteURL + props.location.pathname;
 
   return (
-    <Layout>
-      <title>ASA Manager</title>
+    <View title="ASA Manager">
       <Container>
         <Grid item align="center" justify="center" alignItems="center">
 
@@ -67,7 +66,7 @@ const ASAManager = ({ assetId }) => {
           : <ASAList data={asaSummary} />} */}
         <TxForm assetId={parseInt(assetId)} />
       </Container>
-    </Layout>
+    </View>
 
   );
 };

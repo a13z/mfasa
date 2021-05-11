@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { Router } from '@reach/router';
-
+import { Link } from 'gatsby';
 import axios from 'axios';
 
 import { Container } from '@material-ui/core';
@@ -8,10 +8,13 @@ import Layout from '../components/layout';
 import ASAList from '../components/ASAList/ASAList.component';
 import AlgoSignerContext from '../contexts/algosigner.context';
 
-import ASAOverview from './asaoverview';
-import ASAManager from './asamanager';
-import ASAConfig from './asaconfig';
-import Reports from './reports';
+// import ASAOverview from './app/asaoverview';
+// import ASAManager from './asamanager';
+// import ASAConfig from './app/asaconfig';
+// import Reports from './reports';
+
+import Login from '../components/Login';
+import PrivateRoute from '../components/PrivateRoute';
 
 import AlgoClient from '../services/AlgoClient';
 
@@ -37,12 +40,13 @@ const IndexPage = (props) => {
   }, [ctx]);
   return (
     <Layout>
-      <Router>
+      {/* <Router>
         <ASAOverview path="/" />
         <ASAManager path="/asamanager/:assetId" />
         <ASAConfig path="/asaconfig" />
         <Reports path="/reports" />
-      </Router>
+      </Router> */}
+      <Link to="/app/login">Login</Link>
     </Layout>
   );
 };
