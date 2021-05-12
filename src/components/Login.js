@@ -50,7 +50,7 @@ class Login extends Component {
       .then((res) => {
         if (res.data.token) {
           request.setAuthToken(res.data.token);
-          navigate('/');
+          navigate('/app/asaoverview');
         } else {
           this.setState({
             ephemeralToken: res.data.ephemeral_token,
