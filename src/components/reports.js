@@ -1,12 +1,12 @@
 import React from 'react';
 import { Container, Grid } from '@material-ui/core';
 
-import Layout from '../components/layout';
+import View from './View';
 
-import ReportsForm from '../components/ReportsForm/ReportsForm.components';
+import ReportsForm from './ReportsForm/ReportsForm.components';
 
 const Reports = () => (
-  <Layout>
+  <View title="ASA Reports">
     <title>Reports</title>
     <Container>
       <Grid container align="center" justify="center" alignItems="center">
@@ -16,7 +16,7 @@ const Reports = () => (
       </Grid>
       <ReportsForm />
     </Container>
-  </Layout>
+  </View>
 );
 
 export default Reports;
