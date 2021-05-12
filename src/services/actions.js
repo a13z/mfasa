@@ -17,3 +17,5 @@ export const register = (data) => request.post('djoser/register/', data);
 export const regenerateBackupCodes = (data) => request.post(`auth/${data.method}/codes/regenerate/`, data);
 export const requestCodeSend = (data) => request.post('auth/code/request/', data);
 export const changePrimaryMethod = (data) => request.post('auth/mfa/change-primary-method/', data);
+
+export const fetchUsers = () => request.get('api/v1/users/');
