@@ -31,6 +31,7 @@ import { makeStyles, createStyles } from '@material-ui/core/styles';
 
 import ASATransactionsTable from '../ASATransactionsTable/ASATransactionsTable.component';
 import AlgoSignerContext from '../../contexts/algosigner.context';
+import UserSearch from '../UserSearch/UserSearch.component';
 
 import AlgoClient from '../../services/AlgoClient';
 
@@ -342,7 +343,9 @@ export default function ReportsForm(props) {
                     </FormControl>
                   </Grid>
                 </Grid>
-                <Grid container spacing={4}>
+
+                <UserSearch register={register} />
+                {/* <Grid container spacing={4}>
                   <Grid item xs={12}>
                     <TextField
                       label="Address"
@@ -356,7 +359,7 @@ export default function ReportsForm(props) {
                       helperText={errors.address ? errors.address.message : ''}
                     />
                   </Grid>
-                </Grid>
+                </Grid> */}
                 <Grid container spacing={4}>
                   <Grid item xs={6}>
                     <TextField

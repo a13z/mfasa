@@ -18,6 +18,8 @@ import {
   Switch,
 } from '@material-ui/core';
 
+import Autocomplete from '@material-ui/lab/Autocomplete';
+
 import { useForm, Controller } from 'react-hook-form';
 
 import * as yup from 'yup';
@@ -25,9 +27,12 @@ import { yupResolver } from '@hookform/resolvers/yup';
 
 import { useSnackbar } from 'notistack';
 
+import UserSearch from '../UserSearch/UserSearch.component';
 import AlgoSignerContext from '../../contexts/algosigner.context';
 
 import AlgoClient from '../../services/AlgoClient';
+
+import { fetchUsers } from '../../services/actions';
 
 const useStyles = makeStyles((theme) => createStyles({
   root: {
@@ -98,6 +103,14 @@ const TxForm = ({ assetId }) => {
   const classes = useStyles();
   //   const [address, setAddress] = useState('');
   //   const [amount, setAmount] = useState(0);
+
+  // const [users, setUsers] = useState([]);
+  // const [addresses, setAddresses] = useState([]);
+  // const [selectedUser, setSelectedUser] = useState({});
+  // const [inputUser, setInputUser] = useState({});
+  // const [selectedAddress, setSelectedAddress] = useState('');
+  // const [inputAddress, setInputAddress] = useState('');
+
   const [transactionType, setTransactionType] = useState('');
 
   const [submitted, setSubmitted] = useState(false);
@@ -107,6 +120,17 @@ const TxForm = ({ assetId }) => {
     confirmed: false,
     round: 0,
   });
+
+  // useEffect(() => {
+  //   fetchUsers()
+  //     .then((res) => {
+  //       console.log(res);
+  //       setUsers(res.data);
+  //     })
+  //     .catch((e) => {
+  //       console.error(e);
+  //     });
+  // }, []);
 
   const {
     errors,
@@ -172,7 +196,7 @@ const TxForm = ({ assetId }) => {
             setLoading(false);
             console.error(e);
             enqueueSnackbar(
-              'Error: There is an error sending transaction to Algorand node',
+              `Error: There is an error sending transaction to Algorand node. ${e.message}`,
               {
                 variant: 'error',
               },
@@ -232,7 +256,7 @@ const TxForm = ({ assetId }) => {
 
   const amountSubForm = (
     <Grid container align="center" justify="center" alignItems="center">
-      <Grid item xs={6}>
+      <Grid item xs={9}>
         <TextField
           label="Amount"
           type="number"
@@ -249,7 +273,7 @@ const TxForm = ({ assetId }) => {
   );
   const noteSubForm = (
     <Grid container align="center" justify="center" alignItems="center">
-      <Grid item xs={6}>
+      <Grid item xs={9}>
         <TextField
           label="Note"
           type="text"
@@ -264,7 +288,7 @@ const TxForm = ({ assetId }) => {
   );
   const revokeAddressSubForm = (
     <Grid container align="center" justify="center" alignItems="center">
-      <Grid item xs={6}>
+      <Grid item xs={9}>
         <TextField
           label="Address to revoke assets"
           type="text"
@@ -293,7 +317,7 @@ const TxForm = ({ assetId }) => {
             </Grid>
             <form className={classes.container}>
               <Grid container align="center" justify="center" alignItems="center">
-                <Grid item xs={6}>
+                <Grid item xs={9}>
                   <FormControl fullWidth>
                     <InputLabel htmlFor="transaction-type-select" id="transaction-type-select">
                       Select Transaction Type
@@ -325,8 +349,11 @@ const TxForm = ({ assetId }) => {
                   </FormControl>
                 </Grid>
               </Grid>
-              <Grid container align="center" justify="center" alignItems="center">
-                <Grid item xs={6}>
+
+              <UserSearch register={register} />
+
+              {/* <Grid container align="center" justify="center" alignItems="center">
+                <Grid item xs={9}>
                   <TextField
                     label="To Address"
                     type="text"
@@ -337,14 +364,16 @@ const TxForm = ({ assetId }) => {
                     inputRef={register}
                   />
                 </Grid>
-              </Grid>
+              </Grid> */}
 
               {(transactionType === 'send' || transactionType === 'revoke') && amountSubForm}
               {(transactionType === 'send') && noteSubForm}
               {(transactionType === 'revoke') && revokeAddressSubForm}
 
+              {' '}
+              <div><br /></div>
               <Grid container align="center" justify="center" alignItems="center">
-                <Grid item xs={4} />
+                <Grid item xs={6} />
                 <Grid item xs={2}>
                   <Button
                     variant="contained"
