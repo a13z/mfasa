@@ -130,14 +130,14 @@ export default function MenuAppBar({ siteTitle }) {
               </ListLink>
             </ListItem>
             <ListItem button>
-              <ListLink className={classes.linkText} to="/app/asaconfig/">
+              <ListLink className={classes.linkText} to="/app/asaconfig">
                 <Typography className={classes.title} variant="h6" noWrap>
                   Create ASA
                 </Typography>
               </ListLink>
             </ListItem>
             <ListItem button>
-              <ListLink className={classes.linkText} to="/app/reports/">
+              <ListLink className={classes.linkText} to="/app/reports">
                 <Typography className={classes.title} variant="h6" noWrap>
                   Reports
                 </Typography>

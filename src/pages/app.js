@@ -15,8 +15,9 @@ const App = () => (
   <Layout>
     <Router>
       <PrivateRoute path="/app/asaoverview" component={ASAOverview} />
-      <PrivateRoute path="/app/asamanager/:assetId" component={ASAManager} />
       <PrivateRoute path="/app/asaconfig" component={ASAConfig} />
+      <PrivateRoute path="/app/asamanager/:assetId" component={ASAManager} />
+      <PrivateRoute path="/app/asaconfig/:assetId" component={ASAConfig} />
       <PrivateRoute path="/app/reports" component={Reports} />
       <PrivateRoute path="/app/usersettings" component={UserSettings} />
       <Login path="/app/login" />

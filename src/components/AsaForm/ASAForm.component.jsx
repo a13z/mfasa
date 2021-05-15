@@ -18,6 +18,8 @@ import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 
 import { useSnackbar } from 'notistack';
+import FormCheckBox from '../Controls/checkbox';
+import FormInput from '../Controls/input';
 
 import AlgoSignerContext from '../../contexts/algosigner.context';
 
@@ -59,17 +61,18 @@ const useStyles = makeStyles((theme) => createStyles({
 }));
 
 const validationSchema = yup.object().shape({
-  assetName: yup.string().required('Asset Name Field is Required'),
-  unitName: yup
+  name: yup
+    .string().required('Asset Name Field is Required'),
+  'unit-name': yup
     .string()
     .max(8, 'Unit Name field must be lower than 9 characters')
     .required('Unit Name Field is Required'),
-  totalSupply: yup
+  total: yup
     .number()
     .max(10000000000000000000)
     .typeError('Total Supply must be a number')
     .required('Total Supply Field is Required'),
-  asaUrl: yup
+  url: yup
     .string()
     .url()
     .typeError('Asa URL must contain https://'),
@@ -77,12 +80,17 @@ const validationSchema = yup.object().shape({
     .number()
     .typeError('Decimals must be a number')
     .required('Decimals Field is Required and must be a number'),
-  managerAddress: yup
+  manager: yup
     .string()
     .required('Manager Address is required'),
 });
 
-const ASAForm = ({ asaId }) => {
+const ASAForm = ({ assetId }) => {
+  console.log('ASAForm assetId');
+  console.log(assetId);
+
+  const isEditMode = !!assetId;
+
   const ctx = useContext(AlgoSignerContext);
 
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
@@ -90,10 +98,6 @@ const ASAForm = ({ asaId }) => {
   const classes = useStyles();
   const [defaultFrozen, setDefaultFrozen] = useState(false);
   const [defaultSender, setDefaultSender] = useState(false);
-  const [managerAddress, setManagerAddress] = useState();
-  const [freezeAddress, setFreezeAddress] = useState();
-  const [reserveAddress, setReserveAddress] = useState();
-  const [clawbackAddress, setClawbackAddress] = useState();
 
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -103,16 +107,40 @@ const ASAForm = ({ asaId }) => {
     round: 0,
   });
 
-  const {
-    errors,
-    handleSubmit,
-    register,
-    setError,
-    reset,
-    formState: { isSubmitting },
-  } = useForm({
+  const methods = useForm({
     resolver: yupResolver(validationSchema),
   });
+
+  const {
+    handleSubmit, setValue, register, errors,
+  } = methods;
+
+  useEffect(() => {
+    const algoClient = new AlgoClient(ctx.ledger);
+    if (isEditMode) {
+      algoClient.getAssetInformation(parseInt(assetId))
+        .then((response) => {
+          console.log(JSON.stringify(response));
+          setLoading(false);
+          const fields = ['name', 'unit-name', 'total', 'decimals', 'url', 'metadata-hash', 'default-frozen', 'manager', 'freeze', 'reserve', 'clawback'];
+          fields.forEach((field) => setValue(field, response.asset.params[field]));
+
+          setDefaultFrozen(response.asset.params['default-frozen']);
+
+          const addressesSet = new Set();
+          addressesSet.add(response.asset.params.manager, response.asset.params.freeze, response.asset.params.reserve, response.asset.params.clawback);
+
+          if (addressesSet.size == 1) {
+            setDefaultSender(true);
+          } else {
+            setDefaultSender(false);
+          }
+        })
+        .catch((e) => {
+          console.error(e);
+        });
+    }
+  }, []);
 
   const createASATx = (values, setLoading, setSubmitted) => {
     const { AlgoSigner } = window;
@@ -123,17 +151,17 @@ const ASAForm = ({ asaId }) => {
     // Create transaction
     algoClient.createAssetTxn(
       ctx.currentAddress,
-      values.assetName,
-      values.unitName,
-      parseInt(values.totalSupply),
+      values.name,
+      values['unit-name'],
+      parseInt(values.total),
       parseInt(values.decimals),
-      values.assetUrl,
-      values.metadata,
+      values.url,
+      values['metadata-hash'],
       values.defaultFrozen,
-      values.managerAddress,
-      values.reserveAddress,
-      values.freezeAddress,
-      values.clawbackAddress,
+      values.manager,
+      values.reserve,
+      values.freeze,
+      values.clawback,
     ).then((txnToSign) => {
       console.log('Transaction createAssetTxn created');
       console.log(txnToSign);
@@ -201,17 +229,12 @@ const ASAForm = ({ asaId }) => {
     event.persist();
     console.log(event);
     setDefaultSender(event.target.checked);
+    const fields = ['manager', 'freeze', 'reserve', 'clawback'];
 
     if (event.target.checked) {
-      setManagerAddress(ctx.currentAddress);
-      setFreezeAddress(ctx.currentAddress);
-      setReserveAddress(ctx.currentAddress);
-      setClawbackAddress(ctx.currentAddress);
+      fields.forEach((field) => setValue(field, ctx.currentAddress));
     } else {
-      setManagerAddress();
-      setFreezeAddress();
-      setReserveAddress();
-      setClawbackAddress();
+      fields.forEach((field) => setValue(field, ''));
     }
   };
 
@@ -223,6 +246,7 @@ const ASAForm = ({ asaId }) => {
     try {
       setLoading(true);
       setSubmitted(false);
+      console.log(data);
       createASATx(data, setLoading, setSubmitted);
     } catch (error) {
       enqueueSnackbar(
@@ -271,181 +295,85 @@ const ASAForm = ({ asaId }) => {
       { loading ? <LinearProgress />
         : (
           <div className={classes.root}>
-            <form>
-              <Grid container spacing={4}>
-                <Grid item xs={6}>
-                  <TextField
-                    label="Asset Name"
-                    type="text"
-                    placeholder="Asset Name"
-                    name="assetName"
-                    fullWidth
-                    required
-                    disabled={isSubmitting}
-                    inputRef={register}
-                    error={!!errors.assetName}
-                    helperText={errors.assetName ? errors.assetName.message : ''}
-                  />
-                </Grid>
-                <Grid item xs={6}>
-                  <TextField
-                    label="Unit Name"
-                    type="text"
-                    placeholder="Unit Name"
-                    name="unitName"
-                    fullWidth
-                    required
-                    disabled={isSubmitting}
-                    inputRef={register}
-                    error={!!errors.unitName}
-                    helperText={errors.unitName ? errors.unitName.message : ''}
-                  />
-                </Grid>
-                <Grid item xs={6}>
-                  <TextField
-                    label="Total Supply"
-                    type="number"
-                    placeholder="Total Supply"
-                    name="totalSupply"
-                    fullWidth
-                    required
-                    disabled={isSubmitting}
-                    inputRef={register}
-                    error={!!errors.totalSupply}
-                    helperText={errors.totalSupply ? errors.totalSupply.message : ''}
-                  />
-                </Grid>
-                <Grid item xs={6}>
-                  <TextField
-                    label="Decimals"
-                    type="number"
-                    placeholder="Decimals"
-                    name="decimals"
-                    fullWidth
-                    required
-                    disabled={isSubmitting}
-                    inputRef={register}
-                    error={!!errors.decimals}
-                    helperText={errors.decimals ? errors.decimals.message : ''}
-                  />
-                </Grid>
-                <Grid item xs={6}>
-                  <TextField
-                    label="Asset Url"
-                    type="url"
-                    placeholder="Asset Url"
-                    name="assetUrl"
-                    fullWidth
-                    required
-                    disabled={isSubmitting}
-                    inputRef={register}
-                  />
-                </Grid>
-                <Grid item xs={6}>
-                  <TextField
-                    label="Metadata"
-                    type="text"
-                    placeholder="Metadata"
-                    name="metadata"
-                    fullWidth
-                    required
-                    disabled={isSubmitting}
-                    inputRef={register}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <FormControlLabel
-                    control={(
-                      <Switch
-                        checked={defaultFrozen}
-                        onChange={handleDefaultFrozenChange}
-                        name="defaultFrozen"
-                        inputRef={register}
-                        color="primary"
-                      />
+            <h3>{isEditMode ? `Edit ASA ${assetId}` : 'Create ASA'}</h3>
+            <FormProvider {...methods}>
+              <form>
+                <Grid container spacing={4}>
+                  <Grid item xs={6}>
+                    <FormInput name="name" label="Asset Name" required errorobj={errors} />
+                  </Grid>
+                  <Grid item xs={6}>
+                    <FormInput name="unit-name" label="Unit Name" required errorobj={errors} />
+                  </Grid>
+                  <Grid item xs={6}>
+                    <FormInput name="total" label="Total Supply" type="number" required errorobj={errors} />
+                  </Grid>
+                  <Grid item xs={6}>
+                    <FormInput name="decimals" label="Decimals" type="number" required errorobj={errors} />
+                  </Grid>
+                  <Grid item xs={6}>
+                    <FormInput name="url" label="Asset Url" type="url" required errorobj={errors} />
+                  </Grid>
+                  <Grid item xs={6}>
+                    <FormInput name="metadata-hash" label="Metadata Hash" />
+                  </Grid>
+                  <Grid item xs={12}>
+                    {/* <FormCheckBox name="default-frozen" label="Frozen by default" defaultValue={defaultFrozen} onChange={handleDefaultFrozenChange} /> */}
+                    <FormControlLabel
+                      control={(
+                        <Switch
+                          checked={defaultFrozen}
+                          onChange={handleDefaultFrozenChange}
+                          name="default-frozen"
+                          inputRef={register}
+                          color="primary"
+                        />
                   )}
-                    label="Frozen by default"
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <FormControlLabel
-                    control={(
-                      <Switch
-                        checked={defaultSender}
-                        onChange={handleDefaultSenderChange}
-                        name="defaultSender"
-                        inputRef={register}
-                        color="primary"
-                      />
+                      label="Frozen by default"
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    {/* <FormCheckBox name="default-sender" label="Default to Sender" defaultValue={defaultSender} onChange={handleDefaultSenderChange} /> */}
+                    <FormControlLabel
+                      control={(
+                        <Switch
+                          checked={defaultSender}
+                          onChange={handleDefaultSenderChange}
+                          name="default-sender"
+                          inputRef={register}
+                          color="primary"
+                        />
                   )}
-                    label="Default to Sender"
-                  />
-                </Grid>
-                <Grid item xs={6}>
-                  <TextField
-                    label="Manager Address"
-                    type="text"
-                    placeholder="Manager Address"
-                    name="managerAddress"
-                    value={managerAddress || ''}
-                    fullWidth
-                    required
-                    disabled={isSubmitting}
-                    inputRef={register}
-                    error={!!errors.managerAddress}
-                    helperText={errors.managerAddress ? errors.managerAddress.message : ''}
-                  />
-                </Grid>
-                <Grid item xs={6}>
-                  <TextField
-                    label="Reserve Address"
-                    type="text"
-                    placeholder="Reserve Address"
-                    name="reserveAddress"
-                    value={reserveAddress || ''}
-                    fullWidth
-                    disabled={isSubmitting}
-                    inputRef={register}
-                  />
-                </Grid>
-                <Grid item xs={6}>
-                  <TextField
-                    label="Freeze Address"
-                    type="text"
-                    placeholder="Freeze Address"
-                    name="freezeAddress"
-                    value={freezeAddress || ''}
-                    fullWidth
-                    disabled={isSubmitting}
-                    inputRef={register}
-                  />
-                </Grid>
-                <Grid item xs={6}>
-                  <TextField
-                    label="Clawback Address"
-                    type="text"
-                    placeholder="Clawback Address"
-                    name="clawbackAddress"
-                    value={clawbackAddress || ''}
-                    fullWidth
-                    disabled={isSubmitting}
-                    inputRef={register}
-                  />
-                </Grid>
-                <Grid item>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handleSubmit(onSubmit)}
-                    fullWidth
-                    disabled={isSubmitting}
+                      label="Default to Sender"
+                    />
+                  </Grid>
+                  <Grid item xs={6}>
+                    <FormInput name="manager" label="Manager Address" required errorobj={errors} />
+                  </Grid>
+                  <Grid item xs={6}>
+                    <FormInput name="reserve" label="Reserve Address" />
 
-                  >
-                    SUBMIT
-                  </Button>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <FormInput name="freeze" label="Freeze Address" />
+
+                  </Grid>
+                  <Grid item xs={6}>
+                    <FormInput name="clawback" label="Clawback Address" />
+                  </Grid>
+                  <Grid item>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={handleSubmit(onSubmit)}
+                      fullWidth
+                    >
+                      SUBMIT
+                    </Button>
+                  </Grid>
                 </Grid>
-              </Grid>
-            </form>
+              </form>
+            </FormProvider>
           </div>
         )}
     </Container>
