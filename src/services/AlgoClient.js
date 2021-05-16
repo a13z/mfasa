@@ -191,9 +191,33 @@ class AlgoClient {
       const transaction = await this.getClientV2().sendRawTransaction(rawSignedTxnE).do();
       console.log(transaction);
       return transaction;
-    } catch (error) {
+    } 
+    catch (error) {
       console.error(error);
+      return new Response(JSON.stringify({
+        code: 400,
+        message: error.message,
+      }));
     }
+  }
+
+    // TODO: improve handling errors
+    // await this.getClientV2().sendRawTransaction(rawSignedTxnE).do()
+    // .then((transaction) => {
+    //   console.log('sendRawTransaction transaction');
+    //   if (transaction.status >= 400 && response.status < 600) {
+    //     throw new Error(transaction.message);
+    //   }
+    //   console.log(transaction);
+    //   return transaction;
+    // })
+    // .catch((error) => {
+    //   console.error(error);
+    //   return new Response(JSON.stringify({
+    //     code: 400,
+    //     message: error.message,
+    //   }));
+    // });
   }
 
   async createAlgoSignerTransaction(type, from, to, amount, note, assetIndex, revokeAddress) {
@@ -278,6 +302,10 @@ class AlgoClient {
 
     if (assetDecimals === undefined || assetDecimals === null || assetDecimals === '') {
       assetDecimals = 0;
+    }
+
+    if (assetMetadataHash === '') {
+      assetMetadataHash = undefined;
     }
 
     const txn = {

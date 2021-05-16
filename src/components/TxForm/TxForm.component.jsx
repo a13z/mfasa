@@ -190,6 +190,16 @@ const TxForm = ({ assetId }) => {
                 );
                 setLoading(false);
                 setSubmitted(true);
+              })
+              .catch((e) => {
+                setLoading(false);
+                console.error(e);
+                enqueueSnackbar(
+                  `Error: There is an error waiting for transaction confirmation: ${e.message}`,
+                  {
+                    variant: 'error',
+                  },
+                );
               });
           })
           .catch((e) => {
