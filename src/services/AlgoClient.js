@@ -199,7 +199,6 @@ class AlgoClient {
         message: error.message,
       }));
     }
-  }
 
     // TODO: improve handling errors
     // await this.getClientV2().sendRawTransaction(rawSignedTxnE).do()
