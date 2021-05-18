@@ -9,7 +9,12 @@ const Layout = ({ children }) => (
     <CssBaseline />
     <Header siteTitle="MFASA" />
     <main>{children}</main>
-    <footer>
+    <footer style={{
+      textAlign: 'center',
+      marginLeft: 'auto',
+      marginRight: 'auto',
+    }}
+    >
       © MFASA
       {' '}
       {new Date().getFullYear()}
