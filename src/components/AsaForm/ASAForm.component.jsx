@@ -4,6 +4,7 @@ import { makeStyles, createStyles } from '@material-ui/core/styles';
 
 import {
   TextField,
+  Box,
   Container,
   Button,
   Grid,
@@ -32,8 +33,8 @@ const useStyles = makeStyles((theme) => createStyles({
   },
   paper: {
     padding: theme.spacing(2),
-    textAlign: 'center',
-    color: theme.palette.text.secondary,
+    // textAlign: 'center',
+    // color: theme.palette.text.secondary,
   },
   container: {
     display: 'flex',
@@ -148,81 +149,152 @@ const ASAForm = ({ assetId }) => {
 
     console.log(values);
 
+    if (assetId === undefined) {
     // Create transaction
-    algoClient.createAssetTxn(
-      ctx.currentAddress,
-      values.name,
-      values['unit-name'],
-      parseInt(values.total),
-      parseInt(values.decimals),
-      values.url,
-      values['metadata-hash'],
-      values.defaultFrozen,
-      values.manager,
-      values.reserve,
-      values.freeze,
-      values.clawback,
-    ).then((txnToSign) => {
-      console.log('Transaction createAssetTxn created');
-      console.log(txnToSign);
-      AlgoSigner.sign(txnToSign)
-        .then((signedTxn) => {
-          console.log('Signing txn');
-          console.log(JSON.stringify(signedTxn, null, 2));
-          console.log(signedTxn.txID, signedTxn.blob);
+      algoClient.createAssetTxn(
+        ctx.currentAddress,
+        values.name,
+        values['unit-name'],
+        parseInt(values.total),
+        parseInt(values.decimals),
+        values.url,
+        values['metadata-hash'],
+        values.defaultFrozen,
+        values.manager,
+        values.reserve,
+        values.freeze,
+        values.clawback,
+      ).then((txnToSign) => {
+        console.log('Transaction createAssetTxn created');
+        console.log(txnToSign);
+        AlgoSigner.sign(txnToSign)
+          .then((signedTxn) => {
+            console.log('Signing txn');
+            console.log(JSON.stringify(signedTxn, null, 2));
+            console.log(signedTxn.txID, signedTxn.blob);
 
-          algoClient.sendTransaction(signedTxn.blob)
-            .then((txnSent) => {
-              console.log('Txn signed sent');
-              console.log(txnSent);
-              algoClient.waitForConfirmation(txnSent.txId)
-                .then((response) => {
-                  setAsaTxn(
-                    {
-                      txId: txnSent.txId,
-                      confirmed: true,
-                      round: response,
-                    },
-                  );
-                  console.log(response);
-                  enqueueSnackbar(
-                    `Transaction with txId ${txnSent.txId} has been confirmed in Round ${response}`,
-                    {
-                      variant: 'success',
-                    },
-                  );
-                  setLoading(false);
-                  setSubmitted(true);
-                });
-            })
-            .catch((e) => {
-              setLoading(false);
-              console.error(e);
-              enqueueSnackbar(
-                'Error: There is an error sending transaction to Algorand node',
-                {
-                  variant: 'error',
-                },
-              );
+            algoClient.sendTransaction(signedTxn.blob)
+              .then((txnSent) => {
+                console.log('Txn signed sent');
+                console.log(txnSent);
+                algoClient.waitForConfirmation(txnSent.txId)
+                  .then((response) => {
+                    setAsaTxn(
+                      {
+                        txId: txnSent.txId,
+                        confirmed: true,
+                        round: response,
+                      },
+                    );
+                    console.log(response);
+                    enqueueSnackbar(
+                      `Transaction with txId ${txnSent.txId} has been confirmed in Round ${response}`,
+                      {
+                        variant: 'success',
+                      },
+                    );
+                    setLoading(false);
+                    setSubmitted(true);
+                  });
+              })
+              .catch((e) => {
+                setLoading(false);
+                console.error(e);
+                enqueueSnackbar(
+                  'Error: There is an error sending transaction to Algorand node',
+                  {
+                    variant: 'error',
+                  },
+                );
+              });
+          })
+          .catch((e) => {
+            setLoading(false);
+            console.error(e);
+            enqueueSnackbar('Error: There is an error sending transaction to Algorand node', {
+              variant: 'error',
             });
-        })
-        .catch((e) => {
+          });
+      })
+        .catch((error) => {
           setLoading(false);
-          console.error(e);
-          enqueueSnackbar('Error: There is an error sending transaction to Algorand node', {
+          console.log(error);
+          enqueueSnackbar('Error: There is an error communicating with Algorand node', {
             variant: 'error',
           });
-        });
-    })
-      .catch((error) => {
-        setLoading(false);
-        console.log(error);
-        enqueueSnackbar('Error: There is an error communicating with Algorand node', {
-          variant: 'error',
-        });
-      }).finally(() => {
+        }).finally(() => {
 
-      });
+        });
+    } else {
+      algoClient.modifyAssetTxn(
+        ctx.currentAddress,
+        assetId,
+        values.manager,
+        values.reserve,
+        values.freeze,
+        values.clawback,
+      ).then((txnToSign) => {
+        console.log('Transaction createModifyTxn created');
+        console.log(txnToSign);
+        AlgoSigner.sign(txnToSign)
+          .then((signedTxn) => {
+            console.log('Signing txn');
+            console.log(JSON.stringify(signedTxn, null, 2));
+            console.log(signedTxn.txID, signedTxn.blob);
+
+            algoClient.sendTransaction(signedTxn.blob)
+              .then((txnSent) => {
+                console.log('Txn signed sent');
+                console.log(txnSent);
+                algoClient.waitForConfirmation(txnSent.txId)
+                  .then((response) => {
+                    setAsaTxn(
+                      {
+                        txId: txnSent.txId,
+                        confirmed: true,
+                        round: response,
+                      },
+                    );
+                    console.log(response);
+                    enqueueSnackbar(
+                      `Transaction with txId ${txnSent.txId} has been confirmed in Round ${response}`,
+                      {
+                        variant: 'success',
+                      },
+                    );
+                    setLoading(false);
+                    setSubmitted(true);
+                  });
+              })
+              .catch((e) => {
+                setLoading(false);
+                console.error(e);
+                enqueueSnackbar(
+                  'Error: There is an error sending transaction to Algorand node',
+                  {
+                    variant: 'error',
+                  },
+                );
+              });
+          })
+          .catch((e) => {
+            setLoading(false);
+            console.error(e);
+            enqueueSnackbar('Error: There is an error sending transaction to Algorand node', {
+              variant: 'error',
+            });
+          });
+      })
+        .catch((error) => {
+          setLoading(false);
+          console.log(error);
+          enqueueSnackbar('Error: There is an error communicating with Algorand node', {
+            variant: 'error',
+          });
+        }).finally(() => {
+
+        });
+    }
   };
 
   const handleDefaultSenderChange = (event) => {
@@ -271,7 +343,11 @@ const ASAForm = ({ assetId }) => {
 
   const showAsaCreatedMessage = (
     <div className="msg-confirm">
-      <p>Awesome! Asset has been created.</p>
+      <p>
+        Asset has been `
+        {isEditMode ? 'updated' : 'created' }
+        `
+      </p>
       <p>
         TxId:
         {asaTxn.txId}
@@ -280,18 +356,24 @@ const ASAForm = ({ assetId }) => {
         Round:
         {asaTxn.round}
       </p>
-      <Button
+      {/* <Button
         variant="contained"
         color="primary"
         onClick={() => setSubmitted(false)}
       >
         Create another asset
-      </Button>
+      </Button> */}
     </div>
   );
 
   const showForm = (
-    <Container className={classes.container}>
+    <Grid
+      container
+      spacing={0}
+      // align="center"
+      // justify="center"
+      // alignItems="center"
+    >
       { loading ? <LinearProgress />
         : (
           <div className={classes.root}>
@@ -299,16 +381,16 @@ const ASAForm = ({ assetId }) => {
             <FormProvider {...methods}>
               <form>
                 <Grid container spacing={4}>
-                  <Grid item xs={6}>
+                  <Grid item xs={3}>
                     <FormInput name="name" label="Asset Name" required errorobj={errors} />
                   </Grid>
-                  <Grid item xs={6}>
+                  <Grid item xs={3}>
                     <FormInput name="unit-name" label="Unit Name" required errorobj={errors} />
                   </Grid>
-                  <Grid item xs={6}>
+                  <Grid item xs={3}>
                     <FormInput name="total" label="Total Supply" type="number" required errorobj={errors} />
                   </Grid>
-                  <Grid item xs={6}>
+                  <Grid item xs={3}>
                     <FormInput name="decimals" label="Decimals" type="number" required errorobj={errors} />
                   </Grid>
                   <Grid item xs={6}>
@@ -347,36 +429,41 @@ const ASAForm = ({ assetId }) => {
                       label="Default to Sender"
                     />
                   </Grid>
-                  <Grid item xs={6}>
+                  <Grid item xs={12}>
                     <FormInput name="manager" label="Manager Address" required errorobj={errors} />
                   </Grid>
-                  <Grid item xs={6}>
+                  <Grid item xs={12}>
                     <FormInput name="reserve" label="Reserve Address" />
 
                   </Grid>
-                  <Grid item xs={6}>
+                  <Grid item xs={12}>
                     <FormInput name="freeze" label="Freeze Address" />
 
                   </Grid>
-                  <Grid item xs={6}>
+                  <Grid item xs={12}>
                     <FormInput name="clawback" label="Clawback Address" />
                   </Grid>
-                  <Grid item>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={handleSubmit(onSubmit)}
-                      fullWidth
-                    >
-                      SUBMIT
-                    </Button>
-                  </Grid>
                 </Grid>
+                <Box
+                  align="center"
+                  justify="center"
+                  alignItems="center"
+                  p={2}
+                >
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleSubmit(onSubmit)}
+                  >
+                    {isEditMode ? 'Edit' : 'Create' }
+                  </Button>
+                </Box>
+
               </form>
             </FormProvider>
           </div>
         )}
-    </Container>
+    </Grid>
   );
   return (
     <div className="asa create-asa-page">
