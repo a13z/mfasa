@@ -101,14 +101,6 @@ class UserSettings extends Component {
               updateUser={this.updateUser}
             />
           )}
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={this.redirectToLogin}
-            style={{ marginTop: 30 }}
-          >
-            Logout
-          </Button>
         </div>
       </div>
     );

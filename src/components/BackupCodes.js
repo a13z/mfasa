@@ -26,6 +26,7 @@ export const BackupCodes = ({
         <Button
           onClick={regenerateBackupCodes}
           variant="outlined"
+          style={{ backgroundColor: '#0398D5', color: '#FFFFFF', marginTop: 30 }}
           color="primary"
         >
           Regenerate primary method backup codes

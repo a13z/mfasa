@@ -44,7 +44,7 @@ const useStyles = makeStyles((theme) => createStyles({
   paper: {
     padding: theme.spacing(2),
     textAlign: 'center',
-    color: theme.palette.text.secondary,
+    // color: theme.palette.text.secondary,
   },
   container: {
     display: 'flex',
@@ -175,7 +175,7 @@ export default function ReportsForm(props) {
   const fetchTransactions = async ({
     address, asset, fromDate, toDate, minBalance, maxBalance, transactionType,
   }) => {
-    console.log(asset);
+    console.log(address, asset, fromDate, toDate, minBalance, maxBalance, transactionType);
     if (transactionType === 'all') {
       transactionType = '';
     }
@@ -396,6 +396,7 @@ export default function ReportsForm(props) {
                     onClick={handleSubmit(onSubmit)}
                     fullWidth
                     disabled={isSubmitting}
+                    style={{ backgroundColor: '#0398D5', color: '#FFFFFF', marginTop: 30 }}
                   >
                     SUBMIT
                   </Button>

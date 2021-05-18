@@ -42,7 +42,7 @@ const SMSRequestFormComponent = ({
     <Button
       variant="outlined"
       color="primary"
-      style={{ marginLeft: 30, minWidth: 250 }}
+      style={{ backgroundColor: '#0398D5', color: '#FFFFFF', marginTop: 30 }}
       type="submit"
     >
       Send verification code

@@ -453,6 +453,7 @@ const ASAForm = ({ assetId }) => {
                   <Button
                     variant="contained"
                     color="primary"
+                    style={{ backgroundColor: '#0398D5', color: '#FFFFFF', marginTop: 30 }}
                     onClick={handleSubmit(onSubmit)}
                   >
                     {isEditMode ? 'Edit' : 'Create' }

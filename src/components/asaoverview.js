@@ -8,6 +8,7 @@ import { Container, Grid } from '@material-ui/core';
 import ASAList from './ASAList/ASAList.component';
 import ASATransactionsTable from './ASATransactionsTable/ASATransactionsTable.component';
 import AlgoSignerContext from '../contexts/algosigner.context';
+import View from './View';
 
 import AlgoClient from '../services/AlgoClient';
 
@@ -18,7 +19,7 @@ const useStyles = makeStyles((theme) => createStyles({
   paper: {
     padding: theme.spacing(2),
     textAlign: 'center',
-    color: theme.palette.text.secondary,
+    // color: theme.palette.text.secondary,
   },
   container: {
     display: 'flex',
@@ -99,9 +100,7 @@ const ASAOverview = () => {
     }
   }, [ctx]);
   return (
-    <>
-      <title>ASA Overview</title>
-
+    <View title="ASA Overview">
       <Container className={classes.root}>
         <Grid container align="center" justify="center" alignItems="center">
           <Grid item>
@@ -122,7 +121,7 @@ const ASAOverview = () => {
           <h1>Select an account or this account has not created any ASA</h1>
         )}
       </Container>
-    </>
+    </View>
   );
 };
 

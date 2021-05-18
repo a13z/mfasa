@@ -52,7 +52,7 @@ export const LoginForm = ({
       <Button
         variant="contained"
         color="primary"
-        style={{ color: '#FFF', marginTop: 30 }}
+        style={{ backgroundColor: '#0398D5', color: '#FFFFFF', marginTop: 30 }}
         type="submit"
       >
         Login

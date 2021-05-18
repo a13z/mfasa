@@ -51,7 +51,7 @@ const Header = ({ siteTitle }) => {
   const classes = useStyles();
 
   return (
-    <header className={classes.root}>
+    <header>
       <MenuAppBar siteTitle={siteTitle} />
     </header>
   );

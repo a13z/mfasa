@@ -22,14 +22,14 @@ import request from '../../services/request';
 
 const useStyles = makeStyles((theme) => ({
   abRoot: {
-    backgroundColor: '#3f51b5',
+    backgroundColor: '#0398D5',
   },
   abStatic: {
-    border: 'solid blue 2px',
+    border: 'solid #0398D5 2px',
   },
   header: {
     color: '#0098d5',
-    backgroundColor: '#3f51b5',
+    backgroundColor: '#0398D5',
   },
   navDisplayFlex: {
     display: 'flex',
@@ -41,24 +41,29 @@ const useStyles = makeStyles((theme) => ({
   },
   linkText: {
     textDecoration: 'none',
-    textTransform: 'uppercase',
+    // textTransform: 'uppercase',
     color: 'white',
   },
   link: {
     color: 'white',
     textDecoration: 'none',
   },
+  paper: {
+    padding: theme.spacing(2),
+    textAlign: 'center',
+    // backgroundColor: '#3f51b5',
+  },
   root: {
     flexGrow: 1,
-    backgroundColor: theme.palette.primary.light,
-    '&.MuiAppBar-positionSticky': {
-      '& .MuiToolbar-root': {
-        color: '#3f51b5',
-        '& .MuiButtonBase-root': {
-          fontSize: 24,
-        },
-      },
-    },
+    // backgroundColor: theme.palette.primary.light,
+    // '&.MuiAppBar-positionSticky': {
+    //   '& .MuiToolbar-root': {
+    //     backgroundColor: '#3f51b5',
+    //     '& .MuiButtonBase-root': {
+    //       fontSize: 24,
+    //     },
+    //   },
+    // },
   },
   //   menuButton: {
   //     marginRight: theme.spacing(2),
@@ -70,7 +75,7 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1,
   },
   logo: {
-    maxWidth: 160,
+    maxWidth: 120,
   },
 }));
 
@@ -144,7 +149,7 @@ export default function MenuAppBar({ siteTitle }) {
               </ListLink>
             </ListItem>
           </List>
-          {auth && (
+          {request.isLoggedIn() && (
           <div className={classes.accountButton}>
             <IconButton
               aria-label="account of current user"

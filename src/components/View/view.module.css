@@ -1,4 +1,6 @@
 .view {
   max-width: 1240px;
   margin: 2rem auto 3rem;
+  /* justify-content: center; */
+  /* text-align: center; */
 }

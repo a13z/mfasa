@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-import { Typography } from '@material-ui/core';
+import { Grid, Typography } from '@material-ui/core';
 
 import { BackupCodes } from './BackupCodes';
 import { ConfirmationDialog } from './ConfirmationDialog';
@@ -253,67 +253,75 @@ class UserMFAConfiguration extends Component {
     const activeAuthMethod = [...authBeingActivated, ...enabledAuth];
 
     return (
-      <div>
-        <Typography>
-          Enable any number of application methods
-        </Typography>
-        <div style={{ padding: '0 24px', marginTop: 20 }}>
-          <div>
-            <Typography>
-              Primary
-            </Typography>
-          </div>
-          <EmailRequest
-            switchToggle={this.toggleEmailCode}
-            togglePrimary={this.changePrimaryMethod}
-            requestRegistration={this.requestEmail2FA}
-            confirmRegistration={this.confirm2FAregistration}
-            activeAuthMethod={activeAuthMethod.find((auth) => auth.name === 'email')}
-            authBeingActivated={authBeingActivated.find((auth) => auth.name === 'email')}
-            verificationPending={authWaitingForCode.indexOf('email') !== -1}
-            isEnabled={enabledAuth.find((auth) => auth.name === 'email')}
-          />
-          <ApplicationRequest
-            switchToggle={this.toggleApplicationAuth}
-            togglePrimary={this.changePrimaryMethod}
-            requestRegistration={this.requestApplication2FA}
-            confirmRegistration={this.confirm2FAregistration}
-            activeAuthMethod={activeAuthMethod.find((auth) => auth.name === 'app')}
-            authBeingActivated={authBeingActivated.find((auth) => auth.name === 'app')}
-            verificationPending={authWaitingForCode.indexOf('app') !== -1}
-            isEnabled={enabledAuth.find((auth) => auth.name === 'app')}
-          />
-          <SMSRequest
-            switchToggle={this.toggleSMSCode}
-            togglePrimary={this.changePrimaryMethod}
-            requestRegistration={this.requestSMS2FA}
-            confirmRegistration={this.confirm2FAregistration}
-            activeAuthMethod={activeAuthMethod.find((auth) => auth.name === 'sms')}
-            authBeingActivated={authBeingActivated.find((auth) => auth.name === 'sms')}
-            verificationPending={authWaitingForCode.indexOf('sms') !== -1}
-            isEnabled={enabledAuth.find((auth) => auth.name === 'sms')}
-            phoneNumber={userData.phone_number}
-          />
-          <YubiKeyRequest
-            switchToggle={this.toggleYubiKeyAuth}
-            togglePrimary={this.changePrimaryMethod}
-            requestRegistration={this.requestYubiKey2FA}
-            confirmRegistration={this.confirm2FAregistration}
-            activeAuthMethod={activeAuthMethod.find((auth) => auth.name === 'yubi')}
-            authBeingActivated={authBeingActivated.find((auth) => auth.name === 'yubi')}
-            verificationPending={authWaitingForCode.indexOf('yubi') !== -1}
-            isEnabled={enabledAuth.find((auth) => auth.name === 'yubi')}
-          />
-        </div>
+      <Grid
+        container
+        spacing={0}
+        align="center"
+        justify="center"
+        alignItems="center"
+      >
         <div>
-          <BackupCodes
-            codes={!!enabledAuth.length && codes}
-            showButton={!!enabledAuth.length && MFAConfig.allow_backup_codes_regeneration}
-            regenerateBackupCodes={this.regenerateBackupCodes}
-          />
+          <Typography>
+            Enable any number of application methods
+          </Typography>
+          <div style={{ padding: '0 24px', marginTop: 20 }}>
+            <div>
+              <Typography>
+                Primary
+              </Typography>
+            </div>
+            <EmailRequest
+              switchToggle={this.toggleEmailCode}
+              togglePrimary={this.changePrimaryMethod}
+              requestRegistration={this.requestEmail2FA}
+              confirmRegistration={this.confirm2FAregistration}
+              activeAuthMethod={activeAuthMethod.find((auth) => auth.name === 'email')}
+              authBeingActivated={authBeingActivated.find((auth) => auth.name === 'email')}
+              verificationPending={authWaitingForCode.indexOf('email') !== -1}
+              isEnabled={enabledAuth.find((auth) => auth.name === 'email')}
+            />
+            <ApplicationRequest
+              switchToggle={this.toggleApplicationAuth}
+              togglePrimary={this.changePrimaryMethod}
+              requestRegistration={this.requestApplication2FA}
+              confirmRegistration={this.confirm2FAregistration}
+              activeAuthMethod={activeAuthMethod.find((auth) => auth.name === 'app')}
+              authBeingActivated={authBeingActivated.find((auth) => auth.name === 'app')}
+              verificationPending={authWaitingForCode.indexOf('app') !== -1}
+              isEnabled={enabledAuth.find((auth) => auth.name === 'app')}
+            />
+            <SMSRequest
+              switchToggle={this.toggleSMSCode}
+              togglePrimary={this.changePrimaryMethod}
+              requestRegistration={this.requestSMS2FA}
+              confirmRegistration={this.confirm2FAregistration}
+              activeAuthMethod={activeAuthMethod.find((auth) => auth.name === 'sms')}
+              authBeingActivated={authBeingActivated.find((auth) => auth.name === 'sms')}
+              verificationPending={authWaitingForCode.indexOf('sms') !== -1}
+              isEnabled={enabledAuth.find((auth) => auth.name === 'sms')}
+              phoneNumber={userData.phone_number}
+            />
+            <YubiKeyRequest
+              switchToggle={this.toggleYubiKeyAuth}
+              togglePrimary={this.changePrimaryMethod}
+              requestRegistration={this.requestYubiKey2FA}
+              confirmRegistration={this.confirm2FAregistration}
+              activeAuthMethod={activeAuthMethod.find((auth) => auth.name === 'yubi')}
+              authBeingActivated={authBeingActivated.find((auth) => auth.name === 'yubi')}
+              verificationPending={authWaitingForCode.indexOf('yubi') !== -1}
+              isEnabled={enabledAuth.find((auth) => auth.name === 'yubi')}
+            />
+          </div>
+          <div>
+            <BackupCodes
+              codes={!!enabledAuth.length && codes}
+              showButton={!!enabledAuth.length && MFAConfig.allow_backup_codes_regeneration}
+              regenerateBackupCodes={this.regenerateBackupCodes}
+            />
+          </div>
+          {this.state.confirmationDialog}
         </div>
-        {this.state.confirmationDialog}
-      </div>
+      </Grid>
     );
   }
 }

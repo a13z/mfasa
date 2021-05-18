@@ -3,7 +3,10 @@ import React from 'react';
 import {
   Typography,
   MenuItem,
+  Grid,
 } from '@material-ui/core';
+
+import View from './View';
 
 export const MethodChoice = ({
   label,
@@ -12,27 +15,36 @@ export const MethodChoice = ({
   onChange,
   error,
 }) => (
-  <div>
-    <Typography>
-      {label}
-    </Typography>
-    <ul style={{ padding: 0 }}>
-      {methods.map((method) => (
-        <MenuItem
-          key={method.name}
-          onClick={() => onChange(method.name)}
-          // className="{'selected-method': value === method.name}"
-        >
-          {method.name}
-        </MenuItem>
-      ))}
-    </ul>
-    {error && (
-      <Typography color="error">
-        {error}
-      </Typography>
-    )}
-  </div>
+  <Grid
+    container
+    spacing={0}
+    align="center"
+    justify="right"
+    alignItems="center"
+  >
+    <View>
+      <div>
+        <Typography>
+          {label}
+        </Typography>
+        <ul style={{ padding: 0 }}>
+          {methods.map((method) => (
+            <MenuItem
+              key={method.name}
+              onClick={() => onChange(method.name)}
+            >
+              {method.name}
+            </MenuItem>
+          ))}
+        </ul>
+        {error && (
+        <Typography color="error">
+          {error}
+        </Typography>
+        )}
+      </div>
+    </View>
+  </Grid>
 );
 
 MethodChoice.defaultProps = {
