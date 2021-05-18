@@ -40,7 +40,22 @@
     "0px 11px 15px -7px rgba(0, 0, 0, 0.2),0px 24px 38px 3px rgba(0, 0, 0, 0.14),0px 9px 46px 8px rgba(0, 0, 0, 0.12)"
   ],
   "direction": "ltr",
-  "overrides": {},
+  "raisedButton": {
+    "textColor": "#ffffff",
+    "backgroundColor": "#0398D5",
+    "primaryTextColor": "#0398D5"
+  },
+  "overrides": {
+    "MuiButton": {
+      "color": "#0398D5",
+      "root": {
+        "color": "#0398D5"
+      },
+      "raisedPrimary": {
+        "color": "#0398D5"
+      }
+    }
+  },
   "transitions": {
     "easing": {
       "easeInOut": "cubic-bezier(0.4, 0, 0.2, 1)",
@@ -159,7 +174,7 @@
   "props": {},
   "palette": {
     "tonalOffset": 0.2,
-    "background": { "paper": "#0098d5", "default": "#fafafa" },
+    "background": { "paper": "#0098d5", "default": "#394764" },
     "contrastThreshold": 3,
     "grey": {
       "50": "#fafafa",
@@ -207,9 +222,9 @@
       "active": "rgba(0, 0, 0, 0.54)"
     },
     "primary": {
-      "main": "#3f51b5",
-      "light": "#3f51b5",
-      "dark": "#38006b",
+      "main": "#0398D5",
+      "light": "#0398D5",
+      "dark": "#0398D5",
       "contrastText": "#fff"
     }
   },

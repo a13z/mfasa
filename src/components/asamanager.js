@@ -43,7 +43,7 @@ const ASAManager = ({ assetId }) => {
         <Grid item align="center" justify="center" alignItems="center">
 
           { assetInformation ? (
-            <h2>
+            <h3>
               Managing
               {' '}
               <b>
@@ -55,9 +55,9 @@ const ASAManager = ({ assetId }) => {
               <b>
                 {assetInformation.index}
               </b>
-            </h2>
+            </h3>
           )
-            : <h2 />}
+            : <h3 />}
 
         </Grid>
         {/* {loading ? <CircularProgress />

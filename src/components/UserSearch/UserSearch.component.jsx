@@ -30,7 +30,7 @@ const UserSearch = (props) => {
   return (
     <>
       <Grid container allign="center" justify="center" alignItems="center">
-        <Grid item xs={9}>
+        <Grid item xs>
           <Autocomplete
             value={selectedUser}
             onChange={(event, newValue) => {
@@ -52,7 +52,7 @@ const UserSearch = (props) => {
       </Grid>
 
       <Grid container allign="center" justify="center" alignItems="center">
-        <Grid item xs={9}>
+        <Grid item xs>
           <Autocomplete
             value={selectedAddress}
             onChange={(event, newValue) => {

@@ -1,4 +1,5 @@
 export const parseError = (error) => {
+  console.error(error);
   if (error.response && error.response.data) {
     const { data } = error.response;
 

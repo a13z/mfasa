@@ -4,7 +4,7 @@ import { view } from './view.module.css';
 
 const View = ({ title, children }) => (
   <section className={view}>
-    <h1>{title}</h1>
+    {/* <h1>{title}</h1> */}
     {children}
   </section>
 );

@@ -7,6 +7,7 @@ import {
   Typography,
   Popover,
   MenuItem,
+  Grid,
 } from '@material-ui/core';
 
 import { MethodChoice } from './MethodChoice';
@@ -66,41 +67,48 @@ class VerificationCodeFormComponent extends Component {
     const { anchorEl } = this.state;
 
     return (
-      <form onSubmit={handleSubmit}>
-        {methods && (
+      <Grid
+        container
+        spacing={0}
+        align="center"
+        justify="right"
+        alignItems="center"
+      >
+        <form onSubmit={handleSubmit}>
+          {methods && (
           <MethodChoice
             methods={methods}
             value={values.new_method}
             onChange={(value) => setFieldValue('new_method', value)}
             error={errors.new_method}
           />
-        )}
-        <Typography>
-          Provide valid code or backup code
-        </Typography>
-        <TextField
-          name="code"
-          label="Code"
-          fullWidth
-          onChange={handleChange}
-          onBlur={handleBlur}
-          value={values.code}
-          error={!!errors.code && touched.code}
-          helperText={(touched.code && errors.code) || ' '}
-        />
-        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-          {this.props.requestResend && (
+          )}
+          <Typography>
+            Provide valid code or backup code
+          </Typography>
+          <TextField
+            name="code"
+            label="Code"
+            fullWidth
+            onChange={handleChange}
+            onBlur={handleBlur}
+            value={values.code}
+            error={!!errors.code && touched.code}
+            helperText={(touched.code && errors.code) || ' '}
+          />
+          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            {this.props.requestResend && (
             <div>
               {this.state.time === 0 ? (
                 <Button
-                  style={{ marginTop: 20 }}
+                  style={{ backgroundColor: '#0398D5', color: '#FFFFFF', marginTop: 30 }}
                   onClick={this.requestResend}
                 >
                   Resend Code
                 </Button>
               ) : (
                 <Button
-                  style={{ marginTop: 20 }}
+                  style={{ backgroundColor: '#0398D5', color: '#FFFFFF', marginTop: 30 }}
                   disabled
                 >
                   {this.state.time}
@@ -109,17 +117,17 @@ class VerificationCodeFormComponent extends Component {
                 </Button>
               )}
             </div>
-          )}
-          <Button
-            variant="contained"
-            color="primary"
-            type="submit"
-            style={{ color: '#fff', marginTop: 20 }}
-          >
-            {buttonLabel}
-          </Button>
-        </div>
-        {alternativeMethods && !!alternativeMethods.length && (
+            )}
+            <Button
+              variant="contained"
+              color="primary"
+              type="submit"
+              style={{ backgroundColor: '#0398D5', color: '#FFFFFF', marginTop: 30 }}
+            >
+              {buttonLabel}
+            </Button>
+          </div>
+          {alternativeMethods && !!alternativeMethods.length && (
           <div style={{ marginTop: 30 }}>
             <a
               onClick={(event) => this.setState({ anchorEl: event.target })}
@@ -153,8 +161,9 @@ class VerificationCodeFormComponent extends Component {
               ))}
             </Popover>
           </div>
-        )}
-      </form>
+          )}
+        </form>
+      </Grid>
     );
   }
 }

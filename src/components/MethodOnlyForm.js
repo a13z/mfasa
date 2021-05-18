@@ -19,24 +19,32 @@ export const MethodOnlyForm = withFormik({
   values,
   setFieldValue,
 }) => (
-  <form onSubmit={handleSubmit}>
-    {methods && (
+  <Grid
+    container
+    spacing={0}
+    align="center"
+    justify="right"
+    alignItems="center"
+  >
+    <form onSubmit={handleSubmit}>
+      {methods && (
       <MethodChoice
         methods={methods}
         value={values.new_method}
         onChange={(value) => setFieldValue('new_method', value)}
         error={errors.new_method}
       />
-    )}
-    <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-      <Button
-        variant="contained"
-        color="primary"
-        type="submit"
-        style={{ color: '#fff', marginTop: 20 }}
-      >
-        {buttonLabel}
-      </Button>
-    </div>
-  </form>
+      )}
+      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+        <Button
+          variant="contained"
+          color="primary"
+          type="submit"
+          style={{ backgroundColor: '#0398D5', color: '#FFFFFF', marginTop: 30 }}
+        >
+          {buttonLabel}
+        </Button>
+      </div>
+    </form>
+  </Grid>
 ));

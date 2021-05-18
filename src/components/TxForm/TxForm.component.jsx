@@ -6,6 +6,7 @@ import { makeStyles, createStyles } from '@material-ui/core/styles';
 import {
   TextField,
   Container,
+  Box,
   Button,
   Grid,
   InputLabel,
@@ -43,7 +44,7 @@ const useStyles = makeStyles((theme) => createStyles({
   paper: {
     padding: theme.spacing(2),
     textAlign: 'center',
-    color: theme.palette.text.secondary,
+    // color: theme.palette.text.secondary,
   },
   container: {
     display: 'flex',
@@ -269,7 +270,7 @@ const TxForm = ({ assetId }) => {
 
   const amountSubForm = (
     <Grid container align="center" justify="center" alignItems="center">
-      <Grid item xs={9}>
+      <Grid item xs>
         <TextField
           label="Amount"
           type="number"
@@ -286,7 +287,7 @@ const TxForm = ({ assetId }) => {
   );
   const noteSubForm = (
     <Grid container align="center" justify="center" alignItems="center">
-      <Grid item xs={9}>
+      <Grid item xs>
         <TextField
           label="Note"
           type="text"
@@ -301,7 +302,7 @@ const TxForm = ({ assetId }) => {
   );
   const revokeAddressSubForm = (
     <Grid container align="center" justify="center" alignItems="center">
-      <Grid item xs={9}>
+      <Grid item xs>
         <TextField
           label="Address to revoke assets"
           type="text"
@@ -330,7 +331,7 @@ const TxForm = ({ assetId }) => {
             </Grid>
             <form className={classes.container}>
               <Grid container align="center" justify="center" alignItems="center">
-                <Grid item xs={9}>
+                <Grid item xs>
                   <FormControl fullWidth>
                     <InputLabel htmlFor="transaction-type-select" id="transaction-type-select">
                       Select Transaction Type
@@ -366,7 +367,7 @@ const TxForm = ({ assetId }) => {
               <UserSearch register={register} />
 
               {/* <Grid container align="center" justify="center" alignItems="center">
-                <Grid item xs={9}>
+                <Grid item xs>
                   <TextField
                     label="To Address"
                     type="text"
@@ -383,22 +384,21 @@ const TxForm = ({ assetId }) => {
               {(transactionType === 'send') && noteSubForm}
               {(transactionType === 'revoke') && revokeAddressSubForm}
 
-              {' '}
-              <div><br /></div>
-              <Grid container align="center" justify="center" alignItems="center">
-                <Grid item xs={6} />
-                <Grid item xs={2}>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handleSubmit(onSubmit)}
-                    fullWidth
-                    disabled={isSubmitting}
-                  >
-                    SUBMIT
-                  </Button>
-                </Grid>
-              </Grid>
+              <Box p={2}>
+
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleSubmit(onSubmit)}
+                  fullWidth
+                  disabled={isSubmitting}
+                  style={{ backgroundColor: '#0398D5', color: '#FFFFFF', marginTop: 30 }}
+                >
+                  SUBMIT
+                </Button>
+
+              </Box>
+
             </form>
           </Grid>
         )}
@@ -406,14 +406,18 @@ const TxForm = ({ assetId }) => {
   );
 
   return (
-    <div className="asa create-asa-page">
-      <div className="form-side">
+    <Grid
+      container
+      spacing={0}
+      align="center"
+      justify="center"
+      alignItems="center"
+    >
 
-        {loading ? <CircularProgress /> : showForm}
+      {loading ? <CircularProgress /> : showForm}
 
-        {/* {submitted ? showAsaCreatedMessage : showForm} */}
-      </div>
-    </div>
+      {/* {submitted ? showAsaCreatedMessage : showForm} */}
+    </Grid>
   );
 };
 

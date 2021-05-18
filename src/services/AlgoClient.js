@@ -191,8 +191,7 @@ class AlgoClient {
       const transaction = await this.getClientV2().sendRawTransaction(rawSignedTxnE).do();
       console.log(transaction);
       return transaction;
-    } 
-    catch (error) {
+    } catch (error) {
       console.error(error);
       return new Response(JSON.stringify({
         code: 400,
@@ -356,44 +355,53 @@ class AlgoClient {
     return txn;
   }
 
-  async modifyAsset(
-    wallet,
-    assetId,
-    managerAddress,
-    reserveAddress,
-    freezeAddress,
-    clawbackAddress,
+  async modifyAssetTxn(
+    sender,
+    assetIndex,
+    assetManager,
+    assetReserve,
+    assetFreeze,
+    assetClawback,
   ) {
-    const cp = await this.getChangingParams();
+    const params = await this.getSuggestedTxParams();
 
-    const note = new Uint8Array(Buffer.from('MFASA', 'base64'));
-    const addr = wallet.address;
-    let txn;
-    try {
-      txn = sdk.makeAssetConfigTxn(
-        addr,
-        cp.fee,
-        cp.firstRound,
-        cp.lastRound,
-        note,
-        cp.genHash,
-        cp.genID,
-        assetId,
-        managerAddress,
-        reserveAddress,
-        freezeAddress,
-        clawbackAddress,
-      );
-    } catch (e) {
-      console.log(e);
-    }
+    // const note = new Uint8Array(Buffer.from('MFASA', 'base64'));
+    const note = sdk.encodeObj('MFASA');
 
-    const rawSignedTxn = txn.signTxn(wallet.secretKey);
+    const txn = {
+      from: sender,
+      assetIndex,
+      type: 'acfg',
+      fee: params.fee,
+      // fee: 1000,
+      // flatFee: true,
+      firstRound: params.firstRound,
+      lastRound: params.lastRound,
+      genesisID: params.genesisID,
+      genesisHash: params.genesisHash,
+      assetManager,
+      assetReserve,
+      assetFreeze,
+      assetClawback,
+    };
 
-    const transaction = await this.getClientV2().sendRawTransaction(rawSignedTxn, {
-      'Content-Type': 'application/x-binary',
-    });
-    return transaction;
+    console.log('ModifyAssetTxn: ');
+    console.log(txn);
+
+    // NOTE: Using algosdk method Algosigner doesn't sign it
+    const txnd = sdk.makeAssetConfigTxnWithSuggestedParams(
+      sender,
+      note,
+      assetIndex,
+      assetManager,
+      assetReserve,
+      assetFreeze,
+      assetClawback,
+      params,
+    );
+    console.log('Create Transaction with js sdk ');
+    console.log(txnd);
+    return txn;
   }
 
   async pendingTransactionInformation(txId) {
