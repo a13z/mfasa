@@ -11,7 +11,7 @@ class Request {
   }
 
   initConfig() {
-    const baseURL = 'http://localhost:3000/';
+    const baseURL = `${process.env.GATSBY_BACKEND_BASEURL}`;
     axios.defaults.baseURL = baseURL;
     if (isBrowser) {
       this.setAuthHeader(window.localStorage.getItem('token'));
@@ -46,6 +46,27 @@ class Request {
     }
     delete axios.defaults.headers.common.Authorization;
   }
+
+  parseJwt(token) {
+    try {
+      return JSON.parse(atob(token.split('.')[1]));
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  }
+
+  // parseJwt(token) {
+  //   console.log('parseJwt');
+  //   console.log(token);
+  //   const base64Url = token.split('.')[1];
+  //   const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+  //   const jsonPayload = decodeURIComponent(atob(base64).split('').map((c) => `%${(`00${c.charCodeAt(0).toString(16)}`).slice(-2)}`).join(''));
+
+  //   console.log(JSON.parse(jsonPayload));
+
+  //   return JSON.parse(jsonPayload);
+  // }
 
   parseError(error) {
     const { response = {} } = error;
