@@ -2,7 +2,7 @@ import request from './request';
 
 export const fetchMe = () => request.get('djoser/users/me/');
 export const fetchActiveMethods = () => request.get('auth/mfa/user-active-methods/');
-export const fetchMFAConfig = () => request.get('auth/mfa/config');
+export const fetchMFAConfig = () => request.get('auth/mfa/config/');
 
 export const updateMe = (data) => request.patch('djoser/me/', data);
 
