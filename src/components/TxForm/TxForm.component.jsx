@@ -190,13 +190,23 @@ const TxForm = ({ assetId }) => {
                 );
                 setLoading(false);
                 setSubmitted(true);
+              })
+              .catch((e) => {
+                setLoading(false);
+                console.error(e);
+                enqueueSnackbar(
+                  `Error: There is an error waiting for transaction confirmation: ${e.message}`,
+                  {
+                    variant: 'error',
+                  },
+                );
               });
           })
           .catch((e) => {
             setLoading(false);
             console.error(e);
             enqueueSnackbar(
-              `Error: There is an error sending transaction to Algorand node. ${e.message}`,
+              `Error: There is an error sending transaction to Algorand node: ${e.message}`,
               {
                 variant: 'error',
               },
@@ -206,9 +216,12 @@ const TxForm = ({ assetId }) => {
       .catch((e) => {
         setLoading(false);
         console.error(e);
-        enqueueSnackbar('Error: There is an error sending transaction to Algorand node', {
-          variant: 'error',
-        });
+        enqueueSnackbar(
+          `Error: There is an error with the transaction: ${e.message}`,
+          {
+            variant: 'error',
+          },
+        );
       });
   };
 

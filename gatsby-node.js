@@ -17,6 +17,20 @@ exports.onCreatePage = async ({ page, actions }) => {
 
   // page.matchPath is a special key that's used for matching pages
   // only on the client.
+
+  if (page.path.match(/^\/app\/asaconfig/)) {
+    page.matchPath = '/app/asaconfig';
+
+    // Update the page.
+    createPage(
+      {
+        path: '/app/asaconfig',
+        matchPath: '/app/asaconfig',
+        component: path.resolve('./src/components/asaconfig.js'),
+      },
+    );
+  }
+
   if (page.path.match(/^\/app\/asamanager/)) {
     page.matchPath = '/app/asamanager/*';
 
@@ -26,6 +40,18 @@ exports.onCreatePage = async ({ page, actions }) => {
         path: '/app/asamanager/',
         matchPath: '/app/asamanager/:assetId',
         component: path.resolve('./src/components/asamanager.js'),
+      },
+    );
+  }
+  if (page.path.match(/^\/app\/asaconfig/)) {
+    page.matchPath = '/app/asaconfig/*';
+
+    // Update the page.
+    createPage(
+      {
+        path: '/app/asaconfig/',
+        matchPath: '/app/asaconfig/:assetId',
+        component: path.resolve('./src/components/asaconfig.js'),
       },
     );
   }

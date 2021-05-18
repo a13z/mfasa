@@ -2,10 +2,8 @@ import React, { useState, useContext, useEffect } from 'react';
 import PropTypes from 'prop-types';
 
 import { Container, CircularProgress, Grid } from '@material-ui/core';
-import Select from '@material-ui/core/Select';
 
 import View from './View';
-import ASAList from './ASAList/ASAList.component';
 import TxForm from './TxForm/TxForm.component';
 import AlgoSignerContext from '../contexts/algosigner.context';
 
