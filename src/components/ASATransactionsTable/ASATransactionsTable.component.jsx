@@ -112,9 +112,8 @@ function getExportFileBlob({
   //     },
   //   });
   //   doc.save(`${fileName}.pdf`);
-
-    return false;
-  }
+  //   return false;
+  // }
 
   // Other formats goes here
   return false;
