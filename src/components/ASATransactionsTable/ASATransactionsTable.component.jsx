@@ -329,15 +329,6 @@ const ASATransactionsTable = ({ transactions, assetsCreated }) => {
                 Export All as CSV
               </button>
             </div>
-            <div>
-              <button
-                onClick={() => {
-                  exportData('pdf', true);
-                }}
-              >
-                Export All as PDF
-              </button>
-            </div>
             <TableContainer className={classes.container}>
               <MaUTable style={{ width: 'auto', tableLayout: 'auto' }} className={classes.table} {...getTableProps()}>
                 <TableHead>
