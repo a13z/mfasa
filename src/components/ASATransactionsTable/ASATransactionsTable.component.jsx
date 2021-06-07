@@ -18,8 +18,8 @@ import { useTable, useSortBy, usePagination } from 'react-table';
 import { useExportData } from 'react-table-plugins';
 import Papa from 'papaparse';
 import XLSX from 'xlsx';
-import JsPDF from 'jspdf';
-import 'jspdf-autotable';
+// import JsPDF from 'jspdf';
+// import 'jspdf-autotable';
 
 // import './react-table.css';
 
@@ -97,21 +97,21 @@ function getExportFileBlob({
     return false;
   }
   // PDF example
-  if (fileType === 'pdf') {
-    const headerNames = columns.map((column) => column.exportValue);
-    const doc = new JsPDF();
-    doc.autoTable({
-      head: [headerNames],
-      body: data,
-      margin: { top: 20 },
-      styles: {
-        minCellHeight: 9,
-        halign: 'left',
-        valign: 'center',
-        fontSize: 11,
-      },
-    });
-    doc.save(`${fileName}.pdf`);
+  // if (fileType === 'pdf') {
+  //   const headerNames = columns.map((column) => column.exportValue);
+  //   const doc = new JsPDF();
+  //   doc.autoTable({
+  //     head: [headerNames],
+  //     body: data,
+  //     margin: { top: 20 },
+  //     styles: {
+  //       minCellHeight: 9,
+  //       halign: 'left',
+  //       valign: 'center',
+  //       fontSize: 11,
+  //     },
+  //   });
+  //   doc.save(`${fileName}.pdf`);
 
     return false;
   }
