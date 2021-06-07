@@ -15,7 +15,13 @@ import TableRow from '@material-ui/core/TableRow';
 import { CircularProgress, Grid } from '@material-ui/core';
 
 import { useTable, useSortBy, usePagination } from 'react-table';
-import './react-table.css';
+import { useExportData } from 'react-table-plugins';
+import Papa from 'papaparse';
+import XLSX from 'xlsx';
+import JsPDF from 'jspdf';
+import 'jspdf-autotable';
+
+// import './react-table.css';
 
 const useStyles = makeStyles((theme) => createStyles({
   root: {
@@ -58,6 +64,62 @@ const useStyles = makeStyles((theme) => createStyles({
   },
 }));
 
+function getExportFileBlob({
+  columns, data, fileType, fileName,
+}) {
+  console.log('getExportFileBlog');
+  console.log(data);
+  if (fileType === 'csv') {
+    // CSV example
+    const headerNames = columns.map((col) => col.exportValue);
+    const csvString = Papa.unparse({ fields: headerNames, data });
+    return new Blob([csvString], { type: 'text/csv' });
+  } if (fileType === 'xlsx') {
+    // XLSX example
+
+    const header = columns.map((c) => c.exportValue);
+    const compatibleData = data.map((row) => {
+      const obj = {};
+      header.forEach((col, index) => {
+        obj[col] = row[index];
+      });
+      return obj;
+    });
+
+    const wb = XLSX.utils.book_new();
+    const ws1 = XLSX.utils.json_to_sheet(compatibleData, {
+      header,
+    });
+    XLSX.utils.book_append_sheet(wb, ws1, 'React Table Data');
+    XLSX.writeFile(wb, `${fileName}.xlsx`);
+
+    // Returning false as downloading of file is already taken care of
+    return false;
+  }
+  // PDF example
+  if (fileType === 'pdf') {
+    const headerNames = columns.map((column) => column.exportValue);
+    const doc = new JsPDF();
+    doc.autoTable({
+      head: [headerNames],
+      body: data,
+      margin: { top: 20 },
+      styles: {
+        minCellHeight: 9,
+        halign: 'left',
+        valign: 'center',
+        fontSize: 11,
+      },
+    });
+    doc.save(`${fileName}.pdf`);
+
+    return false;
+  }
+
+  // Other formats goes here
+  return false;
+}
+
 const ASATransactionsTable = ({ transactions, assetsCreated }) => {
   console.log('ASATransactionsTable: transactions', transactions);
   console.log(JSON.stringify(assetsCreated));
@@ -69,6 +131,43 @@ const ASATransactionsTable = ({ transactions, assetsCreated }) => {
       {
         Header: 'Asset Id',
         accessor: 'asset-transfer-transaction.asset-id', // accessor is the "key" in the data
+        getCellExportValue: (row, column) => {
+          if (row.original['asset-transfer-transaction'] !== undefined) {
+            return (row.original['asset-transfer-transaction']['asset-id']);
+          }
+          if (row.original['asset-freeze-transaction'] !== undefined) {
+            return (row.original['asset-freeze-transaction']['asset-id']);
+          }
+          if (row.original['asset-config-transaction'] !== undefined) {
+            return (row.original['created-asset-index']);
+          }
+        },
+        Cell: (cell) => {
+          if (cell.row.original['asset-transfer-transaction'] !== undefined) {
+            return (
+              <span>
+                {cell.row.original['asset-transfer-transaction']['asset-id']}
+              </span>
+            );
+          }
+          if (cell.row.original['asset-freeze-transaction'] !== undefined) {
+            return (
+              <span>
+                {cell.row.original['asset-freeze-transaction']['asset-id']}
+              </span>
+            );
+          }
+          if (cell.row.original['asset-config-transaction'] !== undefined) {
+            return (
+              <span>
+                {cell.row.original['created-asset-index'] || cell.row.original['asset-config-transaction']['asset-id']}
+              </span>
+            );
+          }
+          return (
+            <span />
+          );
+        },
       },
       {
         Header: 'Tx Type',
@@ -91,6 +190,12 @@ const ASATransactionsTable = ({ transactions, assetsCreated }) => {
       {
         Header: 'Amount',
         accessor: 'asset-transfer-transaction.amount',
+        getCellExportValue: (row, column) => {
+          if (row.original['asset-transfer-transaction'] !== undefined) {
+            const { decimals } = assetsCreated[row.original['asset-transfer-transaction']['asset-id'].toString()];
+            return (row.original['asset-transfer-transaction'].amount / (10 ** decimals)).toFixed(decimals);
+          }
+        },
         Cell: (cell) => {
           if (cell.row.original['asset-transfer-transaction'] !== undefined) {
             const { decimals } = assetsCreated[cell.row.original['asset-transfer-transaction']['asset-id'].toString()];
@@ -106,8 +211,32 @@ const ASATransactionsTable = ({ transactions, assetsCreated }) => {
         },
       },
       {
+        Header: 'Unit Name',
+        accessor: 'unit-name',
+        getCellExportValue: (row, column) => {
+          if (row.original['asset-transfer-transaction'] !== undefined) {
+            const unitName = assetsCreated[row.original['asset-transfer-transaction']['asset-id'].toString()]['unit-name'];
+            return unitName;
+          }
+        },
+        Cell: (cell) => {
+          if (cell.row.original['asset-transfer-transaction'] !== undefined) {
+            const unitName = assetsCreated[cell.row.original['asset-transfer-transaction']['asset-id'].toString()]['unit-name'];
+            return (
+              <span>
+                {unitName}
+              </span>
+            );
+          }
+          return (
+            <span />
+          );
+        },
+      },
+      {
         Header: 'Fee (Algos)',
         accessor: 'fee',
+        getCellExportValue: (row, column) => row.original.fee / 1000000,
         Cell: (cell) => (
           <span>
             {cell.row.original.fee / 1000000}
@@ -122,6 +251,10 @@ const ASATransactionsTable = ({ transactions, assetsCreated }) => {
       {
         Header: 'Date/Time (UTC)',
         accessor: 'round-time',
+        getCellExportValue: (row, column) => {
+          const fromRoundTimeToDate = fromUnixTime(row.original['round-time']);
+          return format(fromRoundTimeToDate, "dd-MM-yyyy' 'HH:mm:ss");
+        },
         Cell: (cell) => {
           const fromRoundTimeToDate = fromUnixTime(cell.row.original['round-time']);
           return (
@@ -156,10 +289,13 @@ const ASATransactionsTable = ({ transactions, assetsCreated }) => {
     previousPage,
     setPageSize,
     state: { pageIndex, pageSize },
+    getResolvedState,
+    exportData,
   } = useTable(
     {
       columns,
       data,
+      getExportFileBlob,
       initialState: {
         pageIndex: 0,
         sortBy: [
@@ -171,6 +307,7 @@ const ASATransactionsTable = ({ transactions, assetsCreated }) => {
       },
     },
     useSortBy,
+    useExportData,
     usePagination,
   );
 
@@ -183,6 +320,24 @@ const ASATransactionsTable = ({ transactions, assetsCreated }) => {
       {loading ? <CircularProgress />
         : (
           <>
+            <div>
+              <button
+                onClick={() => {
+                  exportData('csv', true);
+                }}
+              >
+                Export All as CSV
+              </button>
+            </div>
+            <div>
+              <button
+                onClick={() => {
+                  exportData('pdf', true);
+                }}
+              >
+                Export All as PDF
+              </button>
+            </div>
             <TableContainer className={classes.container}>
               <MaUTable style={{ width: 'auto', tableLayout: 'auto' }} className={classes.table} {...getTableProps()}>
                 <TableHead>
